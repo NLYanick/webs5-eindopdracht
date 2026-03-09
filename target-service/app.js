@@ -1,11 +1,11 @@
 require('dotenv').config();
+require('./database'); // Start database
 
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 
 const indexRouter = require('./routes/index');
-const targetsRouter = require('./routes/targets');
 
 const app = express();
 
@@ -17,9 +17,8 @@ app.use(cookieParser());
 const router = express.Router();
 
 router.use('/', indexRouter);
-router.use('/targets', targetsRouter);
 
-app.use('/api/v1', router);
+app.use('/targets', router);
 
 
 app.use(function(req, res, next) {
@@ -31,5 +30,5 @@ app.use(function(err, req, res, next) {
   res.status(500).json({ message: "Internal Server Error" });
 });
 
-const port = process.env.GATEWAY_PORT || 3000;
-app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/api/v1`));
+const port = process.env.TARGET_SERVICE_PORT || 3000;
+app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/targets`));
