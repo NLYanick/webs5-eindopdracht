@@ -1,11 +1,12 @@
 require('dotenv').config();
 
 const express = require('express');
-const path = require('path');
 const cookieParser = require('cookie-parser');
 
 const indexRouter = require('./routes/index');
+const authRouter = require('./routes/auth');
 const targetsRouter = require('./routes/targets');
+const { checkOpaqueAndReplaceWithJWT } = require('./utils');
 
 const app = express();
 
@@ -16,16 +17,20 @@ app.use(cookieParser());
 
 const router = express.Router();
 
+router.use('/auth', authRouter);
+router.use(checkOpaqueAndReplaceWithJWT)
 router.use('/', indexRouter);
 router.use('/targets', targetsRouter);
 
 app.use('/api/v1', router);
 
 
+// Other url's go to 404 page
 app.use(function(req, res, next) {
-  res.status(404).json({ message: "Resoure not found" });
+  res.status(404).json({ message: "Resource not found" });
 });
 
+// Error handler
 app.use(function(err, req, res, next) {
   console.error(err);
   res.status(500).json({ message: "Internal Server Error" });

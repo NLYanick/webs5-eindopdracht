@@ -14,15 +14,23 @@
   "author": "",
   "type": "commonjs",
   "scripts": {
-    "start": "concurrently \"nodemon ./api-gateway/app.js\" \"nodemon ./target-service/app.js\"",
+    "start": "concurrently \"node ./api-gateway/app.js\" \"node ./target-service/app.js\" \"node ./auth-service/app.js\"",
+    "dev": "concurrently \"nodemon ./api-gateway/app.js\" \"nodemon ./target-service/app.js\" \"nodemon ./auth-service/app.js\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "concurrently": "^9.2.1",
+    "connect-roles": "^3.1.2",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "mongoose": "^9.2.4"
+    "jest": "^30.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.2.4",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "uuid": "^13.0.0"
   }
 }
