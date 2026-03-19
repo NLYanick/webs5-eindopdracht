@@ -3,5 +3,5 @@
 - RabbitMQ
 
 - Swagger API Documentation
-- Een paar tests schrijven met een framework als Jest
+- Een paar tests schrijven met Jest
 - Database optimaliseren (CQRS)
