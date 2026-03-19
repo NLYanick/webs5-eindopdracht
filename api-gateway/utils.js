@@ -43,7 +43,7 @@ async function checkOpaqueAndReplaceWithJWT(req, res, next) {
     if(!opaqueToken) return res.status(401).json({ message: 'Unauthorized. Token expired or invalid' });
 
     try {
-        const { json } = await callService('post', process.env.AUTH_SERVICE, 'auth/check', { opaqueToken });
+        const { json } = await callService('post', process.env.AUTH_SERVICE, 'auth/receive-jwt', { opaqueToken });
         const jwtToken = json.token;
         
         if(!jwtToken) return res.status(401).json({ message: 'Unauthorized. Token expired or invalid' });

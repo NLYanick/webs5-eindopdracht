@@ -25,6 +25,11 @@ mongoose.model('User', userSchema);
 const tokenStoreSchema = new mongoose.Schema({
     opaqueToken: String,
     originalJwt: String,
+    userUid: { 
+        type: String, 
+        ref: 'User',
+        required: true 
+    },
     createdAt: { 
         type: Date, 
         default: Date.now, 

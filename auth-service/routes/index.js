@@ -25,10 +25,23 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
     const opaqueToken = crypto.randomBytes(32).toString('hex');
 
-    await TokenStore.create({ 
-        opaqueToken: opaqueToken, 
-        originalJwt: token 
-    });
+    // Update the token or create a new one
+    const tokenData = await TokenStore.findOne({ userUid: user.uid });
+    if(tokenData) {
+        await TokenStore.updateOne(
+            { userUid: user.uid }, 
+            { $set: { 
+                opaqueToken: opaqueToken, 
+                originalJwt: token 
+            } }
+        );
+    } else {
+        await TokenStore.create({ 
+            opaqueToken: opaqueToken, 
+            originalJwt: token,
+            userUid: user.uid
+        });
+    }
 
     res.status(200).json({ token: opaqueToken });
 });
@@ -53,15 +66,28 @@ router.post('/register', async (req, res) => {
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
     const opaqueToken = crypto.randomBytes(32).toString('hex');
 
-    await TokenStore.create({ 
-        opaqueToken: opaqueToken, 
-        originalJwt: token 
-    });
+    // Update the token or create a new one
+    const tokenData = await TokenStore.findOne({ userUid: user.uid });
+    if(tokenData) {
+        await TokenStore.updateOne(
+            { userUid: user.uid }, 
+            { $set: { 
+                opaqueToken: opaqueToken, 
+                originalJwt: token 
+            } }
+        );
+    } else {
+        await TokenStore.create({ 
+            opaqueToken: opaqueToken, 
+            originalJwt: token,
+            userUid: user.uid
+        });
+    }
 
     res.status(200).json({ token: opaqueToken });
 });
 
-router.post('/check', async (req, res) => {
+router.post('/receive-jwt', async (req, res) => {
     const opaqueToken = req.body.opaqueToken;
 
     const tokenData = await TokenStore.findOne({ opaqueToken });
