@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
-const { callService } = require('../utils');
+const circuitBreaker = require('../circuit-breaker');
 
 const targetService = process.env.TARGET_SERVICE;
 
 router.get('/', async (req, res) => {
     try {
-        const { json, status } = await callService("get", targetService, "targets", null, { authorization: req.headers.authorization });
+        const { json, status } = await circuitBreaker.fire("get", targetService, "targets", null, { authorization: req.headers.authorization });
 
         res.status(status).json(json);
     } catch (error) {

@@ -18,7 +18,7 @@ async function callService(method, serviceAddress, resource, body, headers = nul
 
     const response = await fetch(url, options);
 
-    if (response.status === 500) throw new Error(`Service responded with 500`);
+    if (response.status === 500) throw new Error('Service responded with 500');
 
     if (response.status === 204) {
         return { message: "Deleted successfully", status: 204 };
