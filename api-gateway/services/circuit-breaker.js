@@ -1,5 +1,5 @@
 const CircuitBreaker = require('opossum');
-const { callService } = require('./utils');
+const { callService } = require('../utils');
 
 const breakerOptions = {
     timeout: 3000,

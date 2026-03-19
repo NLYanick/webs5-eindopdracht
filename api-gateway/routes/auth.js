@@ -1,5 +1,5 @@
 const express = require('express');
-const circuitBreaker = require('../circuit-breaker');
+const circuitBreaker = require('../services/circuit-breaker');
 
 const router = new express.Router();
 

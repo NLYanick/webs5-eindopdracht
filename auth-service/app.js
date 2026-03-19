@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-require('./database.js');
+require('./services/database.js');
 
 const app = express();
 const port = process.env.AUTH_PORT || 3001;

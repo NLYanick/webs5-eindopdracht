@@ -17,9 +17,9 @@ app.use(cookieParser());
 
 const router = express.Router();
 
+router.use('/', indexRouter);
 router.use('/auth', authRouter);
 router.use(checkOpaqueAndReplaceWithJWT)
-router.use('/', indexRouter);
 router.use('/targets', targetsRouter);
 
 app.use('/api/v1', router);

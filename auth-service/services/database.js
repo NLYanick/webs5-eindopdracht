@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 
 const url = `${process.env.DB_URL}/${process.env.DB_NAME}` || 'mongodb://localhost:27017/mydb';

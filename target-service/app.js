@@ -1,5 +1,5 @@
 require('dotenv').config();
-require('./database'); // Start database
+require('./services/database.js'); // Start database
 
 const express = require('express');
 const cookieParser = require('cookie-parser');

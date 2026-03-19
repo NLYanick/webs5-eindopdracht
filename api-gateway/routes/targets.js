@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const circuitBreaker = require('../circuit-breaker');
+const circuitBreaker = require('../services/circuit-breaker');
 
 const targetService = process.env.TARGET_SERVICE;
 
