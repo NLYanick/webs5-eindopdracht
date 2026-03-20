@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 
-const url = `${process.env.DB_URL}/${process.env.DB_NAME}` || 'mongodb://localhost:27017/mydb';
+const url = `${process.env.DB_URL}/${process.env.DB_NAME_AUTH}` || 'mongodb://localhost:27017/mydb';
 mongoose.connect(url);
 
 const userSchema = new mongoose.Schema({
