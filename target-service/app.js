@@ -17,8 +17,13 @@ app.use(cookieParser());
 
 app.use('/targets', indexRouter);
 
+
 async function main() {
-  await startConsumers();
+  try {
+    await startConsumers();
+  } catch (error) {
+    console.log("[=] Internal server error");
+  }
 }
 
 main();

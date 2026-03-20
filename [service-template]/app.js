@@ -5,6 +5,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 
 const indexRouter = require('./routes/index');
+const startConsumers = require('./services/consumer.js');
 
 
 const app = express();
@@ -15,6 +16,16 @@ app.use(cookieParser());
 
 
 app.use('/', indexRouter);
+
+async function main() {
+  try {
+    await startConsumers();
+  } catch (error) {
+    console.log("[=] Internal server error");
+  }
+}
+
+main();
 
 
 app.use(function(req, res, next) {
