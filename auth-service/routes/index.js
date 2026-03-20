@@ -3,17 +3,18 @@ const router = new express.Router();
 
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 
 const User = mongoose.model('User');
 const TokenStore = mongoose.model('TokenStore');
 
 router.post('/login', async (req, res) => {
-    const { username } = req.body;
-    const user = await User.findOne({ username });
+    const { username, password } = req.body;
+    const user = await User.findOne({ username }).select('+password');
 
-    if(!user) 
-        return res.status(400).json({ message: 'Invalid Credentials' });
+    if(!user || !(await bcrypt.compare(password, user.password))) 
+        return res.status(401).json({ message: 'Invalid Credentials' });
 
     const payload = {
         sub: user.uid,
@@ -46,13 +47,14 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/register', async (req, res) => {
-    const { username } = req.body;
+    const { username, password } = req.body;
 
-    if(!username) 
-        return res.status(400).json({ message: 'Invalid Credentials' });
+    if(!username || !password) 
+        return res.status(401).json({ message: 'Invalid Credentials' });
 
     const user = await User.create({
         username: username,
+        password: password,
         role: "",
     });
 
