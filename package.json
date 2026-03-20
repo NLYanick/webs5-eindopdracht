@@ -16,7 +16,8 @@
   "scripts": {
     "start": "concurrently \"node ./api-gateway/app.js\" \"node ./target-service/app.js\" \"node ./auth-service/app.js\"",
     "dev": "concurrently \"nodemon ./api-gateway/app.js\" \"nodemon ./target-service/app.js\" \"nodemon ./auth-service/app.js\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --detectOpenHandles",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "amqplib": "^0.10.9",
