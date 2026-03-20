@@ -5,6 +5,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 
 const indexRouter = require('./routes/index');
+const startConsumers = require('./services/consumer.js');
 
 
 const app = express();
@@ -15,6 +16,12 @@ app.use(cookieParser());
 
 
 app.use('/targets', indexRouter);
+
+async function main() {
+  await startConsumers();
+}
+
+main();
 
 
 app.use(function(req, res, next) {
