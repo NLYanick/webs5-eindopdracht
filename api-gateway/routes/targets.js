@@ -16,4 +16,26 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.post('/', async (req, res) => {
+    try {
+        const { json, status } = await circuitBreaker.fire("post", targetService, "targets", req.body, { authorization: req.headers.authorization });
+
+        res.status(status).json(json);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
+router.delete('/:id', async (req, res) => {
+    try {
+        const { json, status } = await circuitBreaker.fire("delete", targetService, `targets/${req.params.id}`, null, { authorization: req.headers.authorization });
+
+        res.status(status).json(json);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
 module.exports = router;
