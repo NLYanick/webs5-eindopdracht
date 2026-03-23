@@ -7,6 +7,17 @@ const circuitBreaker = require('../services/circuit-breaker');
 
 const submissionService = process.env.SUBMISSION_SERVICE;
 
+router.get('/', async (req, res) => {
+    try {
+        const { json, status } = await circuitBreaker.fire("get", submissionService, 'submissions', null, { authorization: req.headers.authorization });
+
+        res.status(status).json(json);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
 router.post('/', upload.single('photo'), async (req, res) => {
     try {
         const form = new FormData();
@@ -16,8 +27,6 @@ router.post('/', upload.single('photo'), async (req, res) => {
     
             form.append('photo', blob, req.file.originalname);
         }
-
-        if (req.body) Object.keys(req.body).forEach(key => form.append(key, req.body[key]));
 
         const { json, status } = await circuitBreaker.fire("post", submissionService, "submissions", form, { authorization: req.headers.authorization });
 

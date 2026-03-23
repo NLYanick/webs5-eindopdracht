@@ -8,6 +8,10 @@ const targetSubmissionsSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Target' 
     },
+    userUid: { 
+        type: String, 
+        ref: 'User' 
+    },
     imageUrl: { 
         type: String, 
         required: true 
