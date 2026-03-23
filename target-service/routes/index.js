@@ -3,6 +3,7 @@ const router = express.Router();
 
 const passport = require('../../passport-config.js');
 const roles = require('../services/roles.js');
+const uploads = require('../services/uploads.js');
 
 const { publish } = require('../../pubsub');
 

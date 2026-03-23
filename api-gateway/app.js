@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
+const submissionsRouter = require('./routes/submissions');
 const targetsRouter = require('./routes/targets');
 const { checkOpaqueAndReplaceWithJWT } = require('./utils');
 
@@ -19,7 +20,9 @@ const router = express.Router();
 
 router.use('/', indexRouter);
 router.use('/auth', authRouter);
-router.use(checkOpaqueAndReplaceWithJWT)
+router.use(checkOpaqueAndReplaceWithJWT);
+router.use('/uploads', express.static('public/uploads'));
+router.use('/submissions', submissionsRouter);
 router.use('/targets', targetsRouter);
 
 app.use('/api/v1', router);

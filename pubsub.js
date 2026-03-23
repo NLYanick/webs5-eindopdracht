@@ -11,6 +11,7 @@ async function getChannel() {
         return channel;
     } catch (error) {
         console.log('err in getChannel : ' + error);
+        throw error;
     }
 }
 
@@ -31,7 +32,7 @@ const consume = async (queue, handler) => {
             channel.ack(message);
         });
     } catch (error) {
-        console.log(`error is: ${error}`);
+        console.log(`err in consume: ${error.message || error}`);
     }
 }
 
@@ -44,7 +45,7 @@ const publish = async function publish(queue, msg) {
 
         console.log("Send message: ", msg);
     } catch (error) {
-        console.log('err in publisher : ' + error);
+        console.log(`err in publisher: ${error.message || error}`);
     }
 }
 

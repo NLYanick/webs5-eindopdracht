@@ -13,10 +13,9 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use('/uploads', express.static('public/uploads'));
 
 
-app.use('/', indexRouter);
+app.use('/submissions', indexRouter);
 
 async function main() {
   try {
@@ -37,7 +36,7 @@ app.use(function(req, res, next) {
 app.use(function(err, req, res, next) {
   console.error(err);
   res.status(500).json({ message: "Internal Server Error" });
-});
+}); 
 
-const port = process.env.TARGET_PORT || 3000;
-app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/targets`));
+const port = process.env.SUBMISSION_PORT || 3000;
+app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/submissions`));

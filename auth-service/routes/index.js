@@ -18,7 +18,7 @@ router.post('/login', async (req, res) => {
 
     const payload = {
         sub: user.uid,
-        role: user.role,
+        roles: user.roles,
         apiKey: process.env.API_KEY
     }
     
@@ -55,12 +55,12 @@ router.post('/register', async (req, res) => {
     const user = await User.create({
         username: username,
         password: password,
-        role: "",
+        roles: [],
     });
 
     const payload = {
         sub: user.uid,
-        role: user.role,
+        roles: user.roles,
         apiKey: process.env.API_KEY
     }
 
