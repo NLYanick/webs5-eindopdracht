@@ -12,7 +12,7 @@ const targetSubmissionsSchema = new mongoose.Schema({
         type: String, 
         ref: 'User' 
     },
-    imageUrl: { 
+    imageName: { 
         type: String, 
         required: true 
     },

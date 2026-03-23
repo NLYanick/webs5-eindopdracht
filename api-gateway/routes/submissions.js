@@ -37,11 +37,11 @@ router.post('/', upload.single('photo'), async (req, res) => {
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:filename', async (req, res) => {
     try {
-        if (!req.params.id) return res.status(400).json({ message: 'Photo ID is required' });
+        if (!req.params.filename) return res.status(400).json({ message: 'Photo name is required' });
 
-        const { json, status } = await circuitBreaker.fire("delete", submissionService, `submissions/${req.params.id}`, null, { authorization: req.headers.authorization });
+        const { json, status } = await circuitBreaker.fire("delete", submissionService, `submissions/${req.params.filename}`, null, { authorization: req.headers.authorization });
 
         res.status(status).json(json);
     } catch (error) {
