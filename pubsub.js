@@ -47,6 +47,19 @@ const publish = async function publish(queue, msg) {
     }
 }
 
+const publishEvent = async (exchangeName, message) => {
+    const channel = await getChannel();
+
+    await channel.assertExchange(exchangeName, "fanout", { durable: true });
+
+    channel.publish(
+        exchangeName,
+        "",
+        Buffer.from(JSON.stringify(message)),
+        { persistent: true } // VERY important
+    );
+};
+
 module.exports = { 
     consume,
     publish

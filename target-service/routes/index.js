@@ -5,7 +5,7 @@ const passport = require('../../passport-config.js');
 const roles = require('../services/roles.js');
 const uploads = require('../services/uploads.js');
 
-const { publish } = require('../../pubsub');
+const { publishEvent } = require('../../pubsub');
 const Target = require("../services/database.js")
 
 router.get('/', passport.authenticate('jwt', { session: false }), async function(req, res, next) {
@@ -35,32 +35,61 @@ router.get('/', passport.authenticate('jwt', { session: false }), async function
     }
 });
 
-router.post('/', passport.authenticate('jwt', { session: false }), async function(req, res, next) {
+
+router.post('/',passport.authenticate('jwt', { session: false }),async function (req, res) {
     try {
-        const { title, organizerId, photoUrl, city, lat, lng, radiusInMeter } = req.body;
+    const {
+        title,
+        organizerId,
+        photoUrl,
+        city,
+        lat,
+        lng,
+        radiusInMeter,
+        endDate
+    } = req.body;
 
-        const target = new Target({
-            title,
-            organizerId,
-            photoUrl,
-            city,
-            lat,
-            lng,
-            radiusInMeter
-        });
+    const target = new Target({
+        title,
+        organizerId,
+        photoUrl,
+        city,
+        lat,
+        lng,
+        radiusInMeter,
+        endDate: endDate || undefined
+    });
 
-        const saved = await target.save();
+    const saved = await target.save();
 
-        publish("Target-Queue", { message: "create target", target: saved });
+    await publishEvent("target.events", {
+        type: "target.created",
+        data: {
+            id: saved._id.toString(),
+            title: saved.title,
+            organizerId: saved.organizerId,
+            photoUrl: saved.photoUrl,
+            endDate: saved.endDate,
+            status: "open",
+        }
+    });
 
-        res.status(201).json(saved);
+    return res.status(201).json(saved);
+
     } catch (err) {
         if (err.name === 'ValidationError') {
             return res.status(400).json({ message: err.message });
         }
-        res.status(500).json({ message: 'Internal server error', error: err.message });
+
+        console.error("POST /target error:", err);
+        res.status(500).json({
+            message: 'Internal server error',
+            error: err.message
+        });
     }
-});
+    } 
+);
+
 
 router.delete('/:id', passport.authenticate('jwt', { session: false }), async function(req, res, next) {
     try {
