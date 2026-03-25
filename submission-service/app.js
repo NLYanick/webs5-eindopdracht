@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 
-app.use('/submissions', indexRouter);
+app.use('/targets/:targetId/submissions', indexRouter);
 
 async function main() {
   try {
@@ -39,4 +39,4 @@ app.use(function(err, req, res, next) {
 }); 
 
 const port = process.env.SUBMISSION_PORT || 3000;
-app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/submissions`));
+app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}`));

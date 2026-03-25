@@ -1,0 +1,4 @@
+Check of de target nog valid is
+De score meegeven aan de GET als die berekent is 
+(GET met 1 image maken. Dan heb je de foto zelf en de foto data. Iets van /:filename/data. Of /:filename aangezien de image toch via /uploads gaat i.p.v. /submissions)
+RabbitMQ -> doorsturen naar score service
