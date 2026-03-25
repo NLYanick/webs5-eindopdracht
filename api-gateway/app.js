@@ -8,7 +8,7 @@ const authRouter = require('./routes/auth');
 const submissionsRouter = require('./routes/submissions');
 const targetsRouter = require('./routes/targets');
 const scoresRouter = require('./routes/scores');
-const { checkOpaqueAndReplaceWithJWT } = require('./utils');
+const { checkOpaqueAndReplaceWithJWT } = require('../utils');
 
 const app = express();
 

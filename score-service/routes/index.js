@@ -12,7 +12,7 @@ router.get('/:targetId', passport.authenticate('jwt', { session: false }), roles
 
   // TODO Check in submission-service if there are any submissions for this targetId, if not return 404 
 
-  
+  // TODO return all submission scores and image names
 
   res.json({ message: 'score index', targetId });
 });
