@@ -42,8 +42,6 @@ const publish = async function publish(queue, msg) {
         
         await channel.assertExchange(queue, "fanout", { durable: false });
         await channel.publish(queue, "", Buffer.from(JSON.stringify(msg)));
-
-        console.log("Send message: ", msg);
     } catch (error) {
         console.log(`err in publisher: ${error.message || error}`);
     }
