@@ -14,8 +14,8 @@
   "author": "",
   "type": "commonjs",
   "scripts": {
-    "start": "concurrently \"node ./api-gateway/app.js\" \"node ./target-service/app.js\" \"node ./auth-service/app.js\"",
-    "dev": "concurrently \"nodemon ./api-gateway/app.js\" \"nodemon ./target-service/app.js\" \"nodemon ./auth-service/app.js\"",
+    "start": "concurrently \"node ./api-gateway/app.js\" \"node ./target-service/app.js\" \"node ./auth-service/app.js\" \"node ./submission-service/app.js\" \"node ./score-service/app.js\"",
+    "dev": "concurrently \"nodemon ./api-gateway/app.js\" \"nodemon ./target-service/app.js\" \"nodemon ./auth-service/app.js\" \"nodemon ./submission-service/app.js\" \"nodemon ./score-service/app.js\"",
     "test": "jest --detectOpenHandles",
     "test:coverage": "jest --coverage",
     "test:verbose": "jest --verbose"
@@ -32,6 +32,7 @@
     "jest": "^30.3.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.4",
+    "multer": "^2.1.1",
     "opossum": "^9.0.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
