@@ -7,6 +7,7 @@ const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const submissionsRouter = require('./routes/submissions');
 const targetsRouter = require('./routes/targets');
+const scoresRouter = require('./routes/scores');
 const { checkOpaqueAndReplaceWithJWT } = require('./utils');
 
 const app = express();
@@ -24,6 +25,7 @@ router.use(checkOpaqueAndReplaceWithJWT);
 router.use('/uploads', express.static('public/uploads'));
 router.use('/targets', targetsRouter);
 router.use('/targets/:targetId/submissions', submissionsRouter);
+router.use('/scores', scoresRouter);
 
 app.use('/api/v1', router);
 
