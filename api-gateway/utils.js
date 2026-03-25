@@ -5,15 +5,19 @@ async function callService(method, serviceAddress, resource, body, headers = nul
 
     const options = {
         method,
-        headers: { 'Content-Type': 'application/json', ...headers }
+        headers: headers || {}
     }
 
     if (body) {
         if (options.method.toLowerCase() === "get") {
             const queryString = new URLSearchParams(body).toString();
             url = `${url}?${queryString}`;
-        } else 
+        } else if (body instanceof FormData) {
+            options.body = body;
+        } else {
             options.body = JSON.stringify(body);
+            options.headers['Content-Type'] = 'application/json';
+        }
     }
 
     const response = await fetch(url, options);
