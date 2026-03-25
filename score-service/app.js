@@ -1,5 +1,4 @@
 require('dotenv').config();
-require('./services/database.js'); // Start database
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
@@ -38,5 +37,5 @@ app.use(function(err, req, res, next) {
   res.status(500).json({ message: "Internal Server Error" });
 });
 
-const port = process.env.TARGET_PORT || 3000;
-app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/targets`));
+const port = process.env.SCORE_PORT || 3004;
+app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/scores`));

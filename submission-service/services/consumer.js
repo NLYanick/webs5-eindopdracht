@@ -1,7 +1,7 @@
 const { consume } = require("../../pubsub");
 
 async function startConsumers() {
-    await consume('TODO', async (msg) => {
+    await consume('update-score', async (msg) => {
         console.log(msg)
     });
 }

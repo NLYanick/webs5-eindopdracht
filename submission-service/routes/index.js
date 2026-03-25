@@ -17,13 +17,13 @@ router.post('/', uploads.single('photo'), passport.authenticate('jwt', { session
   try {
     if (!req.file) return res.status(400).json({ message: 'File is required' });
 
-    const targetId = req.body.targetId;
+    const targetId = req.params.targetId;
     // Check if target is still valid | fetch(targetService/check-target/targetId)
 
     const imagePath = req.file.filename;
 
     const submission = await TargetSubmission.create({
-      targetId: req.body.targetId,
+      targetId: targetId,
       userUid: req.user.sub,
       imageName: imagePath,
     });
@@ -67,9 +67,9 @@ router.get('/', passport.authenticate('jwt', { session: false }), roles.can('par
     const submissions = await TargetSubmission.find({ userUid: req.user.sub });
 
     res.status(200).json({
-      image_paths: submissions.map(subm => ({
-        image_name: subm.imageName,
-        target_id: subm.targetId,
+      images: submissions.map(subm => ({
+        imageName: subm.imageName,
+        targetId: subm.targetId,
         score: subm.score || null
       }))
     });
@@ -88,8 +88,8 @@ router.get('/:filename', passport.authenticate('jwt', { session: false }), roles
     if (!submission) return res.status(404).json({ message: 'Submission not found' });
 
     res.status(200).json({ submission: {
-        image_name: submission.imageName,
-        target_id: submission.targetId,
+        imageName: submission.imageName,
+        targetId: submission.targetId,
         score: submission.score || null
       } });
   } catch (error) {
