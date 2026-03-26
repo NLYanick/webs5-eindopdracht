@@ -20,3 +20,10 @@ const targetSubmissionsSchema = new mongoose.Schema({
 });
 
 mongoose.model('TargetSubmission', targetSubmissionsSchema);
+
+
+const targetIdsSchema = new mongoose.Schema({
+    targetId: String,
+});
+
+mongoose.model('TargetId', targetIdsSchema);

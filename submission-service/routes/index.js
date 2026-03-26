@@ -12,13 +12,16 @@ const { publish } = require('../../pubsub.js');
 const targetService = process.env.TARGET_SERVICE;
 
 const TargetSubmission = mongoose.model('TargetSubmission');
+const TargetId = mongoose.model('TargetId');
 
 router.post('/', uploads.single('photo'), passport.authenticate('jwt', { session: false }), roles.can('participant'), async function (req, res, next) {
   try {
     if (!req.file) return res.status(400).json({ message: 'File is required' });
 
     const targetId = req.params.targetId;
-    // Check if target is still valid | fetch(targetService/check-target/targetId)
+
+    const targetExists = await TargetId.exists({ targetId: targetId });
+    if (!targetExists) return res.status(404).json({ message: 'Target not found' });
 
     const imagePath = req.file.filename;
 
