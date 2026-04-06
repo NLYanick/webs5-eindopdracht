@@ -1,7 +1,8 @@
 
 async function callService(method, serviceAddress, resource, body, headers = null) {
     serviceAddress = formatWithSlashes(serviceAddress);
-    let url = `${serviceAddress}${resource}`;
+    let url = `${serviceAddress}${resource}/`;
+    console.log(`Calling: ${method.toUpperCase()} ${url}`);
 
     const options = {
         method,
@@ -36,7 +37,7 @@ async function callService(method, serviceAddress, resource, body, headers = nul
 }
 
 function formatWithSlashes(serviceAddress) {
-    return (serviceAddress.endsWith('/')) ? serviceAddress : '/';
+    return (serviceAddress.endsWith('/')) ? serviceAddress : serviceAddress + '/';
 }
 
 async function checkOpaqueAndReplaceWithJWT(req, res, next) {

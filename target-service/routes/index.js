@@ -9,6 +9,7 @@ const { publishEvent } = require('../../pubsub');
 const Target = require("../services/database.js")
 
 router.get('/', passport.authenticate('jwt', { session: false }), async function(req, res, next) {
+    console.log(`get`);
     try {
         const { city, lat, lng } = req.query;
 
@@ -19,8 +20,8 @@ router.get('/', passport.authenticate('jwt', { session: false }), async function
         }
 
         if (lat && lng) {
-            filter.lat = { $gte: parseFloat(lat) - radius, $lte: parseFloat(lat) + radius };
-            filter.lng = { $gte: parseFloat(lng) - radius, $lte: parseFloat(lng) + radius };
+            filter.lat = { $gte: parseFloat(lat) - radiusInMeter, $lte: parseFloat(lat) + radiusInMeter };
+            filter.lng = { $gte: parseFloat(lng) - radiusInMeter, $lte: parseFloat(lng) + radiusInMeter };
         }
 
         const targets = await Target.find(filter);
@@ -99,7 +100,7 @@ router.delete('/:id', passport.authenticate('jwt', { session: false }), async fu
             return res.status(404).json({ message: 'Target not found' });
         }
 
-        publish("Target-Queue", { message: "delete target", target });
+        publishEvent("target.events", { message: "delete target", target });
 
         res.status(200).json({ message: 'Target deleted', target });
     } catch (err) {

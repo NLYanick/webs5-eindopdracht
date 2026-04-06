@@ -14,4 +14,4 @@ const targetSchema = new mongoose.Schema({
     radiusInMeter: { type: Number, default: 500 }
 }, { timestamps: true });
 
-mongoose.model('Target', targetSchema);
+module.exports = mongoose.model('Target', targetSchema);
