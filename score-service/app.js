@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 
-app.use('/', indexRouter);
+app.use('/score', indexRouter);
 
 async function main() {
   try {
@@ -38,5 +38,5 @@ app.use(function(err, req, res, next) {
   res.status(500).json({ message: "Internal Server Error" });
 });
 
-const port = process.env.TARGET_PORT || 3004;
-app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/targets`));
+const port = process.env.SCORE_PORT || 3004;
+app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/score`));
