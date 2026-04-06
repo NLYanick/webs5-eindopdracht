@@ -2,7 +2,6 @@
 async function callService(method, serviceAddress, resource, body, headers = null) {
     serviceAddress = formatWithSlashes(serviceAddress);
     let url = `${serviceAddress}${resource}/`;
-    console.log(`Calling: ${method.toUpperCase()} ${url}`);
 
     const options = {
         method,

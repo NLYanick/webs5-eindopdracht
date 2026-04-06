@@ -9,7 +9,6 @@ const { publishEvent } = require('../../pubsub');
 const Target = require("../services/database.js")
 
 router.get('/', passport.authenticate('jwt', { session: false }), async function(req, res, next) {
-    console.log(`get`);
     try {
         const { city, lat, lng } = req.query;
 
