@@ -7,7 +7,8 @@ const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const submissionsRouter = require('./routes/submissions');
 const targetsRouter = require('./routes/targets');
-const { checkOpaqueAndReplaceWithJWT } = require('./utils');
+const scoresRouter = require('./routes/scores');
+const { checkOpaqueAndReplaceWithJWT } = require('../utils');
 
 const app = express();
 app.use(express.json());
@@ -19,10 +20,11 @@ const router = express.Router({ mergeParams: true });
 
 router.use('/', indexRouter);
 router.use('/auth', authRouter);
-router.use(checkOpaqueAndReplaceWithJWT);
 router.use('/uploads', express.static('public/uploads'));
+router.use(checkOpaqueAndReplaceWithJWT);
 router.use('/targets', targetsRouter);
 router.use('/targets/:targetId/submissions', submissionsRouter);
+router.use('/scores', scoresRouter);
 
 app.use('/api/v1', router);
 
