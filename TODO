@@ -1,4 +1,4 @@
-- Alle functionaliteit
+- Autorisatie
 
 - Swagger API Documentation
 - Een paar tests schrijven met Jest
@@ -7,6 +7,3 @@
 - Architectuurplaat
 
 - Alle onderlinge API calls in microservices moeten via een circuit breaker
-
-## Submission service
-- Check of de target nog valid is

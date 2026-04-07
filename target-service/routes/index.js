@@ -5,7 +5,7 @@ const passport = require('../../passport-config.js');
 const roles = require('../services/roles.js');
 const uploads = require('../services/uploads.js');
 
-const { publishEvent } = require('../../pubsub');
+const { publish } = require('../../pubsub');
 const Target = require("../services/database.js")
 
 router.get('/', passport.authenticate('jwt', { session: false }), async function(req, res, next) {
@@ -62,7 +62,7 @@ router.post('/',passport.authenticate('jwt', { session: false }),async function 
 
     const saved = await target.save();
 
-    await publishEvent("target.events", {
+    await publish("target.events", {
         type: "target.created",
         data: {
             id: saved._id.toString(),
@@ -99,7 +99,7 @@ router.delete('/:id', passport.authenticate('jwt', { session: false }), async fu
             return res.status(404).json({ message: 'Target not found' });
         }
 
-        publishEvent("target.events", { type: "target.deleted", id: target._id });
+        await publish("target.events", { message: "target.delete", target });
 
         res.status(200).json({ message: 'Target deleted', target });
     } catch (err) {
@@ -109,5 +109,5 @@ router.delete('/:id', passport.authenticate('jwt', { session: false }), async fu
         res.status(500).json({ message: 'Internal server error', error: err.message });
     }
 });
-// publish("Test-Queue", { message: "RabbitMQ Test" })
+
 module.exports = router;

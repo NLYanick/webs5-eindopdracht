@@ -1,5 +1,4 @@
 require('dotenv').config();
-require('./services/database.js'); // Start database
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
@@ -15,7 +14,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 
-app.use('/score', indexRouter);
+app.use('/scores', indexRouter);
 
 async function main() {
   try {
@@ -39,4 +38,4 @@ app.use(function(err, req, res, next) {
 });
 
 const port = process.env.SCORE_PORT || 3004;
-app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/score`));
+app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/scores`));
