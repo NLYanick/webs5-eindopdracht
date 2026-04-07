@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 
 async function startConsumers() {
-    await consume('submission-events','score-service', async (msg) => {
+    await consume('submission-events', async (msg) => {
         if (msg.type === 'submission.created') {
             try {
                 const { submission } = msg.data;
