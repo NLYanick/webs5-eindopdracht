@@ -16,7 +16,7 @@ async function startConsumers() {
                 const { submission } = msg.data;
                 const imageName = submission.imageName;
 
-                const uploadsDir = path.join(__dirname, '../..//public/uploads');
+                const uploadsDir = path.join(__dirname, '../../public/uploads');
                 const target = await Target.findOne({ _id: targetId });
                 if(!target) return;
 

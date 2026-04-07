@@ -36,31 +36,34 @@ router.get('/', passport.authenticate('jwt', { session: false }), async function
 });
 
 
-router.post('/',passport.authenticate('jwt', { session: false }),async function (req, res) {
+router.post('/', uploads.single('target-photo'), passport.authenticate('jwt', { session: false }),async function (req, res) {
     try {
-    const {
-        title,
-        organizerId,
-        photoUrl,
-        city,
-        lat,
-        lng,
-        radiusInMeter,
-        endDate
-    } = req.body;
+        console.log(req.file, req.body);
+        
+        if (!req.file) return res.status(400).json({ message: 'File is required' });
+        
+        const {
+            title,
+            organizerId,
+            city,
+            lat,
+            lng,
+            radiusInMeter,
+            endDate
+        } = req.body;
 
-    const target = new Target({
-        title,
-        organizerId,
-        photoUrl,
-        city,
-        lat,
-        lng,
-        radiusInMeter,
-        endDate: endDate || undefined
-    });
+        const target = new Target({
+            title,
+            organizerId,
+            photoUrl: req.file.filename,
+            city,
+            lat,
+            lng,
+            radiusInMeter,
+            endDate: endDate || undefined
+        });
 
-    const saved = await target.save();
+        const saved = await target.save();
 
     await publish("target.events", {
         type: "target.created",
@@ -74,7 +77,7 @@ router.post('/',passport.authenticate('jwt', { session: false }),async function 
         }
     });
 
-    return res.status(201).json(saved);
+        return res.status(201).json(saved);
 
     } catch (err) {
         if (err.name === 'ValidationError') {
