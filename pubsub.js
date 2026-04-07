@@ -16,13 +16,13 @@ async function getChannel() {
     }
 }
 
-const consume = async (queue, handler) => {
+const consume = async (exchangeName, queueName, handler) => {
     try {
         const channel = await getChannel();
         
-        await channel.assertExchange(queue, "fanout", { durable: true });
+        await channel.assertExchange(exchangeName, "fanout", { durable: true });
 
-        const q = await channel.assertQueue("", { exclusive: true});
+        const q = await channel.assertQueue(queueName, { exclusive: false});
         await channel.bindQueue(q.queue, queue, "");
 
         await channel.consume(q.queue, async (message) => {

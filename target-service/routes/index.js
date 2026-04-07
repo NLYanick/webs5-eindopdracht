@@ -70,7 +70,7 @@ router.post('/',passport.authenticate('jwt', { session: false }),async function 
             organizerId: saved.organizerId,
             photoUrl: saved.photoUrl,
             endDate: saved.endDate,
-            status: "open",
+            status: saved.status,
         }
     });
 
@@ -99,7 +99,7 @@ router.delete('/:id', passport.authenticate('jwt', { session: false }), async fu
             return res.status(404).json({ message: 'Target not found' });
         }
 
-        await publish("target.events", { message: "target.deleted", target });
+        await publish("target.events", { type: "target.deleted", data:target });
 
         res.status(200).json({ message: 'Target deleted', target });
     } catch (err) {
