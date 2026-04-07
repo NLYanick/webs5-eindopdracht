@@ -50,13 +50,13 @@ async function startConsumers() {
 
             const score = calculateScore(submissionTags, targetTags);
 
-            publish('update-score', {
+            await publish('update-score', {
                 imageName,
                 score,
                 targetId: submission.targetId
             });
 
-            publish('mail-score', {
+            await publish('mail-score', {
                 imageName,
                 userUid: submission.userUid,
                 score,
@@ -69,26 +69,23 @@ async function startConsumers() {
 }
 
 function calculateScore(submissionTags, targetTags) {
-    const targetTagMap = {};
-    let totalTargetConfidence = 0;
+    const targetTagsMap = {};
     for (const { tag, confidence } of targetTags) {
-        targetTagMap[tag.en] = confidence;
-        totalTargetConfidence += confidence;
+        targetTagsMap[tag.en] = confidence;
     }
-    console.log('Total target confidence:', totalTargetConfidence);
 
-    let matchScore = 0;
-    let totalWeight = 0;
+    let score = 0;
+    let totalSubmissionScore = 0;
 
     for (const { tag, confidence } of submissionTags) {
-        totalWeight += confidence;
-        if (targetTagMap[tag.en]) {
+        totalSubmissionScore += confidence;
+        if (targetTagsMap[tag.en]) {
             // Average the confidence of the matching tag across both images
-            matchScore += (confidence + targetTagMap[tag.en]) / 2;
+            score += (confidence + targetTagsMap[tag.en]) / 2;
         }
     }
 
-    return totalWeight > 0 ? Math.round((matchScore / totalWeight) * 100) : 0;
+    return totalSubmissionScore > 0 ? Math.round((score / totalSubmissionScore) * 100) : 0;
 }
 
 module.exports = startConsumers;

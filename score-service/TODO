@@ -1,3 +1,3 @@
 Score berekenen met Imagga. Fix error, gebruik ngrok. Misschien moet het de afbeelding kunnen downloaden
-Koppel de submissions aan de targets
+Koppel de submissions aan de targets en gebruik miss `publishEvent()`
 Score mailen naar de user

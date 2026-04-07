@@ -31,7 +31,7 @@ router.post('/', uploads.single('photo'), passport.authenticate('jwt', { session
 
     res.status(201).json({ message: 'Submission uploaded', image_name: imagePath });
 
-    publish('calculate-score', { submission, targetPhotoUrl: targetIdData.photoUrl });
+    await publish('calculate-score', { submission, targetPhotoUrl: targetIdData.photoUrl });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });

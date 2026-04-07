@@ -37,32 +37,18 @@ const consume = async (queue, handler) => {
     }
 }
 
-const publish = async function publish(queue, msg) {
+const publish = async (exchangeName, message) => {
     try {
         const channel = await getChannel();
         
-        await channel.assertExchange(queue, "fanout", { durable: true });
-        await channel.publish(queue, "", Buffer.from(JSON.stringify(msg)), { persistent: true });
+        await channel.assertExchange(exchangeName, "fanout", { durable: true });
+        await channel.publish(exchangeName, "", Buffer.from(JSON.stringify(message)), { persistent: true });
     } catch (error) {
         console.log(`err in publisher: ${error.message || error}`);
     }
 }
 
-const publishEvent = async (exchangeName, message) => {
-    const channel = await getChannel();
-
-    await channel.assertExchange(exchangeName, "fanout", { durable: true });
-
-    channel.publish(
-        exchangeName,
-        "",
-        Buffer.from(JSON.stringify(message)),
-        { persistent: true }
-    );
-};
-
 module.exports = { 
     consume,
-    publish,
-    publishEvent
+    publish
 };

@@ -5,8 +5,6 @@ const passport = require('../../passport-config.js');
 const roles = require('../services/roles.js');
 const circuitBreaker = require('../services/circuit-breaker.js');
 
-const { publish } = require('../../pubsub');
-
 const SUBMISSION_SERVICE = process.env.SUBMISSION_SERVICE;
 
 router.get('/:targetId', passport.authenticate('jwt', { session: false }), roles.can('participant'), async (req, res, next) => {
