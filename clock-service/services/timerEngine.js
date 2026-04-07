@@ -1,5 +1,5 @@
 const Timer = require("./database");
-const { publishEvent } = require("../../pubsub");
+const { publish } = require("../../pubsub");
 
 const activeTimers = new Map();
 const activeReminders = new Map();
@@ -31,7 +31,7 @@ async function triggerClose(id) {
     const timer = await Timer.findOneAndDelete({ _id: id });
     if (!timer) return;
 
-    await publishEvent("target.events", {
+    await publish("target.events", {
         type: "target.closed",
         data: {id: id }
     });
@@ -99,7 +99,7 @@ async function triggerReminder(id) {
     );
 
     if (!timer || now >= timer.closeAt.getTime()) return;
-    await publishEvent("target.events", {
+    await publish("target.events", {
         type: "target.reminder",
         data: { id }
     });
