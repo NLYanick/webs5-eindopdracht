@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 
-app.use('/', indexRouter);
+app.use('/targets/:targetId/registers', indexRouter);
 
 async function main() {
   try {
@@ -39,4 +39,4 @@ app.use(function(err, req, res, next) {
 });
 
 const port = process.env.REGISTER_PORT || 3005;
-app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/register`));
+app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/targets/:targetId/registers`));

@@ -51,4 +51,4 @@ app.use(function (err, req, res, next) {
 });
 
 const port = process.env.SUBMISSION_PORT || 3003;
-app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}`));
+app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/targets/:targetId/submissions`));

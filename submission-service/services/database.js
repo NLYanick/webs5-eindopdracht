@@ -6,15 +6,17 @@ mongoose.connect(url);
 const targetSubmissionsSchema = new mongoose.Schema({
     targetId: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Target' 
+        ref: 'Target',
+        required: true
     },
     userUid: { 
         type: String, 
-        ref: 'User' 
+        ref: 'User',
+        required: true
     },
     imageName: { 
         type: String, 
-        required: true 
+        required: true
     },
     score: Number,
     createdAt: {
