@@ -3,9 +3,8 @@ const Target = require("./database.js");
 
 async function startConsumers() {
     await consume('target.events', async (msg) => {
-        if (msg.type === 'target.ended') {
-            await Target.findByIdAndUpdate(msg.data.id, { status: 'closed' });
-            console.log(`Target ${msg.data.id} closed`);
+        if (msg.type === 'target.closed') {
+            await Target.findByIdAndUpdate(msg.data.id, { status: 'CLOSED' });
         }
     });
 }

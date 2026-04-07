@@ -6,6 +6,12 @@ mongoose.connect(url);
 const targetSchema = new mongoose.Schema({
     title: { type: String, required: true, trim: true },
     organizerId: { type: String, required: true },
+    status: {
+        type: String,
+        enum: ['OPEN', 'CLOSED'],
+        default: 'OPEN',
+        index: true
+    },
     photoUrl: { type: String, required: false },
     endDate: { type: Date, default: () => new Date(Date.now() + 60 * 60 * 1000) },
     city: { type: String, trim: true },
