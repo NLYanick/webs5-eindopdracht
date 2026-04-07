@@ -1,0 +1,2 @@
+Autorisatie
+Als een user is ingeschreven, maak dan een nieuwe jwt token in de auth service
