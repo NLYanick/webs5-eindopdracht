@@ -5,7 +5,8 @@ mongoose.connect(url);
 
 const timerSchema = new mongoose.Schema({
     _id: String,
-    closeAt: { type: Date, required: true }
+    closeAt: { type: Date, required: true },
+    lastReminderAt: { type: Date, default: Date.now() }
 });
 
 module.exports = mongoose.model('Timer', timerSchema);

@@ -1,9 +1,6 @@
 const { consume } = require("../../pubsub");
 const Timer = require("./database");
-const {
-    scheduleTimer,
-    cancelTimer
-} = require("./timerEngine");
+const {scheduleTimer,cancelTimer} = require("./timerEngine");
 
 
 async function startConsumers() {
