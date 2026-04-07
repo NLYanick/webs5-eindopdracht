@@ -13,12 +13,21 @@ async function startConsumers() {
             console.error("Error updating target submission:", error);
         }
     });
-    await consume('target-created', async (msg) => {
-        console.log(msg)
+    await consume('target.events', async (msg) => {
         try {
-            await TargetId.create({ targetId: msg.targetId });
+            switch (msg.type) {
+                case 'target.created':
+                    await TargetId.create({ targetId: msg.data.id, photoUrl: msg.data.photoUrl });
+                    break;
+                case 'target.deleted':
+                    await TargetId.deleteOne({ targetId: msg.data.id });
+                    await TargetSubmission.deleteMany({ targetId: msg.data.id });
+                    break;
+                default:
+                    console.warn(`Unhandled event type: ${msg.type}`);
+            }
         } catch (error) {
-            console.error("Error creating target ID:", error);
+            console.error("Error handling target event:", error);
         }
     });
 }

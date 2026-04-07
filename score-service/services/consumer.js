@@ -10,7 +10,7 @@ async function startConsumers() {
             const { submission } = msg;
             const imageName = submission.imageName;
 
-            const uploadsDir = path.join(__dirname, '../..//public/uploads');
+            const uploadsDir = path.join(__dirname, '../../public/uploads');
 
             const targetBuffer = fs.readFileSync(path.join(uploadsDir, msg.targetPhotoUrl));
             const submissionBuffer = fs.readFileSync(path.join(uploadsDir, imageName));
