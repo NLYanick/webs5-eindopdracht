@@ -69,7 +69,7 @@ async function startConsumers() {
 }
 
 function calculateScore(submissionTags, targetTags) {
-    const targetTagsMap = {};
+    const targetTagsMap = {}; // Map all confidence scores of target tags for quick lookup
     for (const { tag, confidence } of targetTags) {
         targetTagsMap[tag.en] = confidence;
     }
@@ -80,8 +80,7 @@ function calculateScore(submissionTags, targetTags) {
     for (const { tag, confidence } of submissionTags) {
         totalSubmissionScore += confidence;
         if (targetTagsMap[tag.en]) {
-            // Average the confidence of the matching tag across both images
-            score += (confidence + targetTagsMap[tag.en]) / 2;
+            score += (confidence + targetTagsMap[tag.en]) / 2; // Average score
         }
     }
 
