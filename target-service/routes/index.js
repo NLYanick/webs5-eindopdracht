@@ -15,7 +15,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), async function
         let filter = {};
 
         if (city) {
-            filter.city = { $regex: city, $options: 'i' }; // case-insensitive
+            filter.city = { $regex: city, $options: 'i' };
         }
 
         if (lat && lng) {
@@ -99,7 +99,7 @@ router.delete('/:id', passport.authenticate('jwt', { session: false }), async fu
             return res.status(404).json({ message: 'Target not found' });
         }
 
-        await publish("target.events", { message: "delete target", target });
+        await publish("target.events", { message: "target.deleted", target });
 
         res.status(200).json({ message: 'Target deleted', target });
     } catch (err) {
