@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 const indexRouter = require('./routes/index');
 const startConsumers = require('./services/consumer.js');
 
-const TargetId = mongoose.model("TargetId");
+const Target = mongoose.model("Target");
 
 
 const app = express();
@@ -23,7 +23,7 @@ app.use('/targets/:targetId/submissions', checkIfTargetExists, indexRouter);
 async function checkIfTargetExists(req, res, next) {
   const targetId = req.params.targetId;
   
-  const targetExists = await TargetId.exists({ targetId: targetId });
+  const targetExists = await Target.exists({ targetId: targetId });
   if (!targetExists) return res.status(404).json({ message: 'Target not found' });
   
   next();

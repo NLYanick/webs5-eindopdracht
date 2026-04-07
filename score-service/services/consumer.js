@@ -1,4 +1,6 @@
 const { consume, publish } = require("../../pubsub");
+const mongoose = require("mongoose");
+require('./database.js')
 const circuitBreaker = require("./circuit-breaker");
 
 const Target = mongoose.model('Target');
@@ -56,15 +58,25 @@ async function startConsumers() {
 
                 const score = calculateScore(submissionTags, targetTags);
 
-                await publish('score.events', {
-                    type: 'score.created',
-                    data:{
-                    imageName,
-                    userUid: submission.userUid,
-                    score,
-                    targetId: submission.targetId
-                    }
+                
+                const scoreModel = await Score.create({
+                    targetId: submission.targetId,
+                    submissionId: submission._id,
+                    userUid: userUid,
+                    score: score
                 });
+
+                if(scoreModel){
+                    await publish('score.events', {
+                        type: 'score.created',
+                        data:{
+                        imageName,
+                        userUid: submission.userUid,
+                        score,
+                        targetId: submission.targetId
+                        }
+                    });
+                }
             } catch (error) {
                 console.error("Error calculating score:", error);
             }
