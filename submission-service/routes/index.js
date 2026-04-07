@@ -63,9 +63,29 @@ router.delete('/:filename', passport.authenticate('jwt', { session: false }), ro
 
 router.get('/', passport.authenticate('jwt', { session: false }), roles.can('participant'), async function (req, res, next) {
   try {
+    const targetId = req.params.targetId;
+    const submissions = await TargetSubmission.find({ targetId: targetId });
+
+    res.status(200).json({
+      images: submissions.map(subm => ({
+        imageName: subm.imageName,
+        targetId: subm.targetId,
+        score: subm.score || null,
+        userUid: subm.userUid
+      }))
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+router.get('/user', passport.authenticate('jwt', { session: false }), roles.can('participant'), async function (req, res, next) {
+  try {
     if (!req.user.sub) return res.status(400).json({ message: 'User ID is required' });
 
-    const submissions = await TargetSubmission.find({ userUid: req.user.sub });
+    const targetId = req.params.targetId;
+    const submissions = await TargetSubmission.find({ userUid: req.user.sub, targetId: targetId });
 
     res.status(200).json({
       images: submissions.map(subm => ({
@@ -79,6 +99,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), roles.can('par
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+
 router.get('/:filename', passport.authenticate('jwt', { session: false }), roles.can('participant'), async function (req, res, next) {
   try {
     const photoName = req.params.filename;

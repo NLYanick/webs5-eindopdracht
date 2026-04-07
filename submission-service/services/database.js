@@ -17,6 +17,10 @@ const targetSubmissionsSchema = new mongoose.Schema({
         required: true 
     },
     score: Number,
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 mongoose.model('TargetSubmission', targetSubmissionsSchema);

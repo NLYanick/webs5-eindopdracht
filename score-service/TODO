@@ -1,3 +1,2 @@
-Score berekenen met Imagga. Fix error, gebruik ngrok. Misschien moet het de afbeelding kunnen downloaden
-Koppel de submissions aan de targets en gebruik miss `publishEvent()`
-Score mailen naar de user
+Image upload gedeelte bij Targets
+"Het moet mogelijk zijn dat de foto's van deelnemers op jou target en jou target(s) verwijderd moeten kunnen worden;"
