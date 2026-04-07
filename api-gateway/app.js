@@ -20,8 +20,8 @@ const router = express.Router({ mergeParams: true });
 
 router.use('/', indexRouter);
 router.use('/auth', authRouter);
-router.use(checkOpaqueAndReplaceWithJWT);
 router.use('/uploads', express.static('public/uploads'));
+router.use(checkOpaqueAndReplaceWithJWT);
 router.use('/targets', targetsRouter);
 router.use('/targets/:targetId/submissions', submissionsRouter);
 router.use('/scores', scoresRouter);

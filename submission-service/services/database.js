@@ -24,6 +24,7 @@ mongoose.model('TargetSubmission', targetSubmissionsSchema);
 
 const targetIdsSchema = new mongoose.Schema({
     targetId: String,
+    photoUrl: String,
 });
 
 mongoose.model('TargetId', targetIdsSchema);

@@ -9,8 +9,6 @@ const roles = require('../services/roles.js');
 const uploads = require('../services/uploads.js');
 const { publish } = require('../../pubsub.js');
 
-const targetService = process.env.TARGET_SERVICE;
-
 const TargetSubmission = mongoose.model('TargetSubmission');
 const TargetId = mongoose.model('TargetId');
 
@@ -20,8 +18,8 @@ router.post('/', uploads.single('photo'), passport.authenticate('jwt', { session
 
     const targetId = req.params.targetId;
 
-    const targetExists = await TargetId.exists({ targetId: targetId });
-    if (!targetExists) return res.status(404).json({ message: 'Target not found' });
+    const targetIdData = await TargetId.findOne({ targetId: targetId });
+    if (!targetIdData) return res.status(404).json({ message: 'Target not found' });
 
     const imagePath = req.file.filename;
 
@@ -33,7 +31,7 @@ router.post('/', uploads.single('photo'), passport.authenticate('jwt', { session
 
     res.status(201).json({ message: 'Submission uploaded', image_name: imagePath });
 
-    publish('calculate-score', { submission });
+    publish('calculate-score', { submission, targetPhotoUrl: targetIdData.photoUrl });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });
