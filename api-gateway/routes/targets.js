@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const upload = multer();
 
 const circuitBreaker = require('../services/circuit-breaker');
 
@@ -16,9 +18,20 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', upload.single('target-photo'), async (req, res) => {
     try {
-        const { json, status } = await circuitBreaker.fire("post", targetService, "targets", req.body, { authorization: req.headers.authorization });
+        if (!req.file) return res.status(400).json({ message: 'File is required' });
+
+        const blob = new Blob([req.file.buffer], { type: req.file.mimetype });
+        
+        const form = new FormData();
+        form.append('target-photo', blob, req.file.originalname);
+
+        Object.entries(req.body).forEach(([key, value]) => {
+            form.append(key, value);
+        });
+
+        const { json, status } = await circuitBreaker.fire("post", targetService, "targets", form, { authorization: req.headers.authorization });
 
         res.status(status).json(json);
     } catch (error) {
