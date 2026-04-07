@@ -1,10 +1,10 @@
 require('dotenv').config();
-require('./services/database.js'); // Start database
+require('./services/database.js');
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
 
-const indexRouter = require('./routes/index');
+const indexRouter = require('./routes/index.js');
 const startConsumers = require('./services/consumer.js');
 
 
@@ -13,7 +13,6 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
 
 app.use('/targets', indexRouter);
 
@@ -27,7 +26,6 @@ async function main() {
 }
 
 main();
-
 
 app.use(function(req, res, next) {
   res.status(404).json({ message: "Resource not found" });

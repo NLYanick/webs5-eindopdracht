@@ -11,7 +11,6 @@ const scoresRouter = require('./routes/scores');
 const { checkOpaqueAndReplaceWithJWT } = require('../utils');
 
 const app = express();
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -28,7 +27,6 @@ router.use('/targets/:targetId/submissions', submissionsRouter);
 router.use('/scores', scoresRouter);
 
 app.use('/api/v1', router);
-
 
 // Other url's go to 404 page
 app.use(function(req, res, next) {

@@ -1,3 +1,4 @@
+const { trusted } = require('mongoose');
 const { getConnection } = require('./rabbitmq-connection.js');
 let channel;
 
@@ -19,9 +20,9 @@ const consume = async (queue, handler) => {
     try {
         const channel = await getChannel();
         
-        await channel.assertExchange(queue, "fanout", { durable: false });
+        await channel.assertExchange(queue, "fanout", { durable: true });
 
-        const q = await channel.assertQueue("", { exclusive: false});
+        const q = await channel.assertQueue("", { exclusive: true});
         await channel.bindQueue(q.queue, queue, "");
 
         await channel.consume(q.queue, async (message) => {
@@ -47,7 +48,21 @@ const publish = async function publish(queue, msg) {
     }
 }
 
+const publishEvent = async (exchangeName, message) => {
+    const channel = await getChannel();
+
+    await channel.assertExchange(exchangeName, "fanout", { durable: true });
+
+    channel.publish(
+        exchangeName,
+        "",
+        Buffer.from(JSON.stringify(message)),
+        { persistent: true }
+    );
+};
+
 module.exports = { 
     consume,
-    publish
+    publish,
+    publishEvent
 };
