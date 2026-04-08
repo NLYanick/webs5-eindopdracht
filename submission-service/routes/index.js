@@ -17,7 +17,6 @@ router.post('/', uploads.single('photo'), passport.authenticate('jwt', { session
     if (!req.file) return res.status(400).json({ message: 'File is required' });
 
     const targetId = req.params.targetId;
-
     const target = await Target.findOne({ _id: targetId });
     if (!target) return res.status(404).json({ message: 'Target not found' });
     if (target.status === 'CLOSED') return res.status(400).json({ message: 'Target closed' });

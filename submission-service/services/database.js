@@ -12,7 +12,7 @@ const submissionsSchema = new mongoose.Schema({
         type: String, 
         ref: 'User' 
     },
-    imageName: { 
+    photoUrl: { 
         type: String, 
         required: true 
     },
