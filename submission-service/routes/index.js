@@ -8,6 +8,7 @@ const passport = require('../../passport-config.js');
 const roles = require('../services/roles.js');
 const uploads = require('../services/uploads.js');
 const { publish } = require('../../pubsub.js');
+const { isRegistered } = require('../services/middleware.js');
 
 const TargetSubmission = mongoose.model('TargetSubmission');
 const TargetId = mongoose.model('TargetId');
@@ -80,7 +81,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), roles.can('par
   }
 });
 
-router.get('/user', passport.authenticate('jwt', { session: false }), roles.can('participant'), async function (req, res, next) {
+router.get('/user', passport.authenticate('jwt', { session: false }), isRegistered, roles.can('target-participant'), async function (req, res, next) {
   try {
     if (!req.user.sub) return res.status(400).json({ message: 'User ID is required' });
 

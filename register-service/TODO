@@ -1,4 +1,0 @@
-Autorisatie
-Als een user is ingeschreven, maak dan een nieuwe jwt token in de auth service
-Check of de user al is ingeschreven voor de target
-Check of de user al is geregistreerd in de auth service

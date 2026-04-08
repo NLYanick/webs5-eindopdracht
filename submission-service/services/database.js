@@ -18,12 +18,8 @@ const targetSubmissionsSchema = new mongoose.Schema({
         type: String, 
         required: true
     },
-    score: Number,
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-});
+    score: Number
+}, { timestamps: true });
 
 mongoose.model('TargetSubmission', targetSubmissionsSchema);
 
@@ -31,6 +27,7 @@ mongoose.model('TargetSubmission', targetSubmissionsSchema);
 const targetIdsSchema = new mongoose.Schema({
     targetId: String,
     photoUrl: String,
+    organizerId: String
 });
 
 mongoose.model('TargetId', targetIdsSchema);
