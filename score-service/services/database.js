@@ -12,7 +12,7 @@ const scoreSchema = new mongoose.Schema({
 
 const targetSchema = new mongoose.Schema({
     photoUrl: { type: String, required: false },
-}, { timestamps: true });
+}, { timestamps: false });
 
 mongoose.model('Target', targetSchema);
 mongoose.model('Score', scoreSchema);

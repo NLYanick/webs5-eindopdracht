@@ -10,14 +10,15 @@ const fs = require('fs');
 const path = require('path');
 
 async function startConsumers() {
-    await consume('submission-events', async (msg) => {
+    await consume('submission.events', async (msg) => {
         if (msg.type === 'submission.created') {
             try {
-                const { submission } = msg.data;
+                const submission = msg.data;
+                console.log(submission);
                 const imageName = submission.imageName;
 
                 const uploadsDir = path.join(__dirname, '../../public/uploads');
-                const target = await Target.findOne({ _id: targetId });
+                const target = await Target.findOne({ _id: submission.targetId });
                 if(!target) return;
 
                 const targetBuffer = fs.readFileSync(path.join(uploadsDir, target.photoUrl));
@@ -62,7 +63,7 @@ async function startConsumers() {
                 const scoreModel = await Score.create({
                     targetId: submission.targetId,
                     submissionId: submission._id,
-                    userUid: userUid,
+                    userUid: submission.userUid,
                     score: score
                 });
 
@@ -82,7 +83,7 @@ async function startConsumers() {
             }
         }
     });
-    await consume('target-events', async (msg) => {
+    await consume('target.events', async (msg) => {
         if (msg.type === 'target.created') {
             try {
                 await Target.create({ _id: msg.data.id, photoUrl: msg.data.photoUrl });
