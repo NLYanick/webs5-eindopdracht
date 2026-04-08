@@ -1,69 +1,102 @@
 const { consume, publish } = require("../../pubsub");
+const mongoose = require("mongoose");
+require('./database.js')
 const circuitBreaker = require("./circuit-breaker");
+
+const Target = mongoose.model('Target');
+const Score = mongoose.model('Score');
 
 const fs = require('fs');
 const path = require('path');
 
 async function startConsumers() {
-    await consume('calculate-score', async (msg) => {
-        try {
-            const { submission } = msg;
-            const imageName = submission.imageName;
+    await consume('submission.events', async (msg) => {
+        if (msg.type === 'submission.created') {
+            try {
+                const submission = msg.data;
+                console.log(submission);
+                const imageName = submission.imageName;
 
-            const uploadsDir = path.join(__dirname, '../../public/uploads');
+                const uploadsDir = path.join(__dirname, '../../public/uploads');
+                const target = await Target.findOne({ _id: submission.targetId });
+                if(!target) return;
 
-            const targetBuffer = fs.readFileSync(path.join(uploadsDir, msg.targetPhotoUrl));
-            const submissionBuffer = fs.readFileSync(path.join(uploadsDir, imageName));
+                const targetBuffer = fs.readFileSync(path.join(uploadsDir, target.photoUrl));
+                const submissionBuffer = fs.readFileSync(path.join(uploadsDir, imageName));
 
-            const targetFormData = new FormData();
-            targetFormData.append('image', new Blob([targetBuffer]), { filename: msg.targetPhotoUrl });
+                const targetFormData = new FormData();
+                targetFormData.append('image', new Blob([targetBuffer]), { filename: target.photoUrl });
 
-            const submissionFormData = new FormData();
-            submissionFormData.append('image', new Blob([submissionBuffer]), { filename: imageName });
+                const submissionFormData = new FormData();
+                submissionFormData.append('image', new Blob([submissionBuffer]), { filename: imageName });
 
-            const [submissionResult, targetResult] = await Promise.all([
-                circuitBreaker.fire(
-                    "POST",
-                    process.env.IMAGGA_BASE_URL,
-                    'tags',
-                    targetFormData,
-                    { authorization: process.env.IMAGGA_AUTH }
-                ),
-                circuitBreaker.fire(
-                    "POST",
-                    process.env.IMAGGA_BASE_URL,
-                    'tags',
-                    submissionFormData,
-                    { authorization: process.env.IMAGGA_AUTH }
-                )
-            ]);
+                const [submissionResult, targetResult] = await Promise.all([
+                    circuitBreaker.fire(
+                        "POST",
+                        process.env.IMAGGA_BASE_URL,
+                        'tags',
+                        targetFormData,
+                        { authorization: process.env.IMAGGA_AUTH }
+                    ),
+                    circuitBreaker.fire(
+                        "POST",
+                        process.env.IMAGGA_BASE_URL,
+                        'tags',
+                        submissionFormData,
+                        { authorization: process.env.IMAGGA_AUTH }
+                    )
+                ]);
 
-            if (submissionResult.status !== 200) {
-                throw new Error(`Imagga API error on submission image. Status: ${submissionResult.status}`);
+                if (submissionResult.status !== 200) {
+                    throw new Error(`Imagga API error on submission image. Status: ${submissionResult.status}`);
+                }
+                if (targetResult.status !== 200) {
+                    throw new Error(`Imagga API error on target image. Status: ${targetResult.status}`);
+                }
+
+                const submissionTags = submissionResult.json.result.tags;
+                const targetTags = targetResult.json.result.tags;
+
+                const score = calculateScore(submissionTags, targetTags);
+
+                
+                const scoreModel = await Score.create({
+                    targetId: submission.targetId,
+                    submissionId: submission._id,
+                    userUid: submission.userUid,
+                    score: score
+                });
+
+                if(scoreModel){
+                    await publish('score.events', {
+                        type: 'score.created',
+                        data:{
+                        imageName,
+                        userUid: submission.userUid,
+                        score,
+                        targetId: submission.targetId
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("Error calculating score:", error);
             }
-            if (targetResult.status !== 200) {
-                throw new Error(`Imagga API error on target image. Status: ${targetResult.status}`);
+        }
+    });
+    await consume('target.events', async (msg) => {
+        if (msg.type === 'target.created') {
+            try {
+                await Target.create({ _id: msg.data.id, photoUrl: msg.data.photoUrl });
+            } catch (error) {
+                console.error("Error saving target creation:", error);
             }
-
-            const submissionTags = submissionResult.json.result.tags;
-            const targetTags = targetResult.json.result.tags;
-
-            const score = calculateScore(submissionTags, targetTags);
-
-            await publish('update-score', {
-                imageName,
-                score,
-                targetId: submission.targetId
-            });
-
-            await publish('mail-score', {
-                imageName,
-                userUid: submission.userUid,
-                score,
-                targetId: submission.targetId
-            });
-        } catch (error) {
-            console.error("Error calculating score:", error);
+        }
+        if (msg.type === 'target.deleted') {
+            try {
+                await Target.deleteOne({ _id: msg.data.id });
+            } catch (error) {
+                console.error("Error saving target deletion:", error);
+            }
         }
     });
 }

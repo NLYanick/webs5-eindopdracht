@@ -1,33 +1,37 @@
 const mongoose = require("mongoose");
 const { consume } = require("../../pubsub");
 
-const TargetSubmission = mongoose.model("TargetSubmission");
-const TargetId = mongoose.model("TargetId");
+const Target = mongoose.model("Target");
+const Submission = mongoose.model("Submission");
 
 async function startConsumers() {
-    await consume('update-score', async (msg) => {
-        console.log(msg)
-        try {
-            await TargetSubmission.updateOne({ imageName: msg.imageName }, { score: msg.score });
-        } catch (error) {
-            console.error("Error updating target submission:", error);
-        }
-    });
     await consume('target.events', async (msg) => {
-        try {
-            switch (msg.type) {
-                case 'target.created':
-                    await TargetId.create({ targetId: msg.data.id, photoUrl: msg.data.photoUrl, organizerId: msg.data.organizerId });
-                    break;
-                case 'target.deleted':
-                    await TargetId.deleteOne({ targetId: msg.target._id });
-                    await TargetSubmission.deleteMany({ targetId: msg.target._id });
-                    break;
-                default:
-                    console.warn(`Unhandled event type: ${msg.type}`);
+        if (msg.type === 'target.created') {
+            try {
+                await Target.create({ _id: msg.data.id, organizerId: msg.data.organizerId });
+            } catch (error) {
+                console.error("Error creating target ID:", error);
             }
-        } catch (error) {
-            console.error("Error handling target event:", error);
+        }
+        if (msg.type === 'target.deleted') {
+            try {
+                await Target.deleteOne({ _id: msg.data.id });
+                await Submission.deleteMany({ targetId: msg.data.id });
+            } catch (error) {
+                console.error("Error creating target ID:", error);
+            }
+        }
+        if (msg.type === "target.closed") {
+            try {
+                const targetId = msg.data.id;
+
+                await Target.findOneAndUpdate(
+                    { _id: targetId, status: "OPEN" },
+                    { status: "CLOSED" }
+                );
+            } catch (error) {
+                console.error("Error handling target.closed:", error);
+            }
         }
     });
 }

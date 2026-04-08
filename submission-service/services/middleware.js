@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 const circuitBreaker = require('./circuit-breaker');
-const TargetId = mongoose.model('TargetId');
+const Target = mongoose.model('Target');
 
 async function fetchTargetId(req, res, next) {
     try {
-        const targetIdData = await TargetId.findById(req.params.targetId).lean(); // `lean()` for plain JS object
+        const targetIdData = await Target.findById(req.params.targetId).lean(); // `lean()` for plain JS object
         req.targetOrganizerId = targetIdData?.organizerId;
         
         next();
