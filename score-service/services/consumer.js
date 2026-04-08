@@ -15,7 +15,6 @@ async function startConsumers() {
         if (msg.type === 'submission.created') {
             try {
                 const submission = msg.data;
-                console.log(submission);
                 const photoUrl = submission.photoUrl;
 
                 const uploadsDir = path.join(__dirname, '../../public/uploads');

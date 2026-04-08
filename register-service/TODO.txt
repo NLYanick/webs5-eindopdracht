@@ -1,7 +1,5 @@
 Merge de Reader Service hierin en fix alles
-Score service Autorisatie
-Fix de merge fouten
 Als een target wordt verwijderd, moeten alle registers verwijderd worden daarvan
-Fix de scores ophalen en updaten
+Als een submission wordt verwijderd, moeten alle scores daarvan verwijderd worden
 Check of de user al is ingeschreven voor de target
 Check of de user al is geregistreerd in de auth service

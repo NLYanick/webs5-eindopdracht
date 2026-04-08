@@ -69,7 +69,7 @@ router.delete('/:filename', passport.authenticate('jwt', { session: false }), is
 router.get('/', passport.authenticate('jwt', { session: false }), fetchTargetId, roles.can('target-owner'), async function (req, res, next) {
   try {
     const targetId = req.params.targetId;
-    const submissions = await Submission.find({ _id: targetId });
+    const submissions = await Submission.find({ targetId: targetId });
 
     res.status(200).json({
       images: submissions.map(subm => ({
