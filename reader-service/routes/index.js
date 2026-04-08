@@ -4,7 +4,10 @@ const router = express.Router();
 const passport = require('../../passport-config.js');
 const roles = require('../services/roles.js');
 
-const Target = require("../services/database.js")
+require('../services/database.js');
+const mongoose = require('mongoose');
+const Target = mongoose.model('Target');
+const Submission = mongoose.model('Submission');
 
 // GET /reader/targets - list targets, filterable by city or lat/lng
 router.get('/targets', passport.authenticate('jwt', { session: false }), async function (req, res, next) {
@@ -17,7 +20,7 @@ router.get('/targets', passport.authenticate('jwt', { session: false }), async f
             filter.city = { $regex: city, $options: 'i' };
         }
 
-        const targets = await Target.find(filter);
+        let targets = await Target.find(filter);
         if (lat && lng) {
             const latF = parseFloat(lat);
             const lngF = parseFloat(lng);
@@ -37,17 +40,6 @@ router.get('/targets', passport.authenticate('jwt', { session: false }), async f
         res.status(500).json({ message: 'Internal server error', error: err.message });
     }
 });
-
-// // GET /reader/targets/:id - get a single target
-// router.get('/targets/:id', passport.authenticate('jwt', { session: false }), async function (req, res, next) {
-//     try {
-//         const target = await Target.findById(req.params.id);
-//         if (!target) return res.status(404).json({ message: 'Target not found' });
-//         res.status(200).json(target);
-//     } catch (err) {
-//         res.status(500).json({ message: 'Internal server error', error: err.message });
-//     }
-// });
 
 // GET /reader/targets/:id/submissions - get all submissions for a target
 router.get('/targets/:id/submissions', passport.authenticate('jwt', { session: false }), async function (req, res, next) {
@@ -72,10 +64,10 @@ router.get('/targets/:id/submissions/my', passport.authenticate('jwt', { session
     }
 });
 
-// GET /reader/targets/:id/scores
-router.get('/targets/:id/scores', passport.authenticate('jwt', { session: false }), async function (req, res, next) {
+// GET /reader/scores/:targetId
+router.get('/scores/:targetId', passport.authenticate('jwt', { session: false }), async function (req, res, next) {
     try {
-        const submissions = await Submission.find({ targetId: req.params.id });
+        const submissions = await Submission.find({ targetId: req.params.targetId });
         res.status(200).json({
             scores: submissions.map(sub => ({
                 score: sub.score,
