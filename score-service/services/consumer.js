@@ -94,8 +94,18 @@ async function startConsumers() {
         if (msg.type === 'target.deleted') {
             try {
                 await Target.deleteOne({ _id: msg.data.id });
+                await Score.deleteMany({ targetId: msg.data.id });
             } catch (error) {
                 console.error("Error saving target deletion:", error);
+            }
+        }
+    });
+    await consume('submission.events', async (msg) => {
+        if (msg.type === 'submission.deleted') {
+            try {
+                await Score.deleteMany({ submissionId: msg.data.id });
+            } catch (error) {
+                console.error("Error saving submission deletion:", error);
             }
         }
     });

@@ -15,6 +15,7 @@ async function startConsumers() {
         }
         if (msg.type === 'target.deleted') {
             await Target.findByIdAndDelete(msg.data.id);
+            await Submission.deleteMany({ targetId: msg.data.id });
         }
         if (msg.type === 'target.closed') {
             await Target.findByIdAndUpdate(msg.data.id, { status: 'CLOSED' });
