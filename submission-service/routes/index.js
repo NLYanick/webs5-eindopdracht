@@ -9,29 +9,29 @@ const roles = require('../services/roles.js');
 const uploads = require('../services/uploads.js');
 const { publish } = require('../../pubsub.js');
 
-const TargetSubmission = mongoose.model('TargetSubmission');
-const TargetId = mongoose.model('TargetId');
+const Submission = mongoose.model('Submission');
+const Target = mongoose.model('Target');
 
 router.post('/', uploads.single('photo'), passport.authenticate('jwt', { session: false }), roles.can('participant'), async function (req, res, next) {
   try {
     if (!req.file) return res.status(400).json({ message: 'File is required' });
 
     const targetId = req.params.targetId;
-
-    const targetIdData = await TargetId.findOne({ targetId: targetId });
-    if (!targetIdData) return res.status(404).json({ message: 'Target not found' });
+    const target = await Target.findOne({ _id: targetId });
+    if (!target) return res.status(404).json({ message: 'Target not found' });
+    if (target.status === 'CLOSED') return res.status(400).json({ message: 'Target closed' });
 
     const imagePath = req.file.filename;
 
-    const submission = await TargetSubmission.create({
+    const submission = await Submission.create({
       targetId: targetId,
       userUid: req.user.sub,
       imageName: imagePath,
     });
 
-    res.status(201).json({ message: 'Submission uploaded', image_name: imagePath });
+    await publish('submission.events', {type: "submission.created", data: submission });
 
-    await publish('calculate-score', { submission, targetPhotoUrl: targetIdData.photoUrl });
+    res.status(201).json({ message: 'Submission uploaded', image_name: imagePath });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });
@@ -44,16 +44,18 @@ router.delete('/:filename', passport.authenticate('jwt', { session: false }), ro
 
     if (!photoName) return res.status(400).json({ message: 'Photo name is required' });
 
-    const submissionExists = await TargetSubmission.exists({ imageName: photoName });
+    const submissionExists = await Submission.exists({ imageName: photoName });
     if (!submissionExists) return res.status(404).json({ message: 'Submission not found' });
 
-    await TargetSubmission.findOneAndDelete({ imageName: `${photoName}` });
+    const submission = await Submission.findOneAndDelete({ imageName: `${photoName}` });
 
     const filePath = path.join('public/uploads', photoName);
     fs.unlink(filePath, (err) => {
       if (err) console.error('Error deleting file:', err);
     });
-
+    if(submission){
+      await publish('submission.events', {type: "submission.deleted", data: submission });
+    }
     res.status(204).json({ message: 'Submission deleted' });
   } catch (error) {
     console.error(error);
@@ -64,7 +66,7 @@ router.delete('/:filename', passport.authenticate('jwt', { session: false }), ro
 router.get('/', passport.authenticate('jwt', { session: false }), roles.can('participant'), async function (req, res, next) {
   try {
     const targetId = req.params.targetId;
-    const submissions = await TargetSubmission.find({ targetId: targetId });
+    const submissions = await Submission.find({ _id: targetId });
 
     res.status(200).json({
       images: submissions.map(subm => ({
@@ -85,7 +87,7 @@ router.get('/user', passport.authenticate('jwt', { session: false }), roles.can(
     if (!req.user.sub) return res.status(400).json({ message: 'User ID is required' });
 
     const targetId = req.params.targetId;
-    const submissions = await TargetSubmission.find({ userUid: req.user.sub, targetId: targetId });
+    const submissions = await Submission.find({ userUid: req.user.sub, targetId: targetId });
 
     res.status(200).json({
       images: submissions.map(subm => ({
@@ -105,7 +107,7 @@ router.get('/:filename', passport.authenticate('jwt', { session: false }), roles
     const photoName = req.params.filename;
     if (!photoName) return res.status(400).json({ message: 'Photo name is required' });
     
-    const submission = await TargetSubmission.findOne({ imageName: photoName });
+    const submission = await Submission.findOne({ imageName: photoName });
 
     if (!submission) return res.status(404).json({ message: 'Submission not found' });
 

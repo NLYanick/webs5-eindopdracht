@@ -65,17 +65,17 @@ router.post('/', uploads.single('target-photo'), passport.authenticate('jwt', { 
 
         const saved = await target.save();
 
-        await publish("target.events", {
-            type: "target.created",
-            data: {
-                id: saved._id.toString(),
-                title: saved.title,
-                organizerId: saved.organizerId,
-                photoUrl: saved.photoUrl,
-                endDate: saved.endDate,
-                status: "open",
-            }
-        });
+    await publish("target.events", {
+        type: "target.created",
+        data: {
+            id: saved._id.toString(),
+            title: saved.title,
+            organizerId: saved.organizerId,
+            photoUrl: saved.photoUrl,
+            endDate: saved.endDate,
+            status: saved.status,
+        }
+    });
 
         return res.status(201).json(saved);
 
@@ -102,7 +102,7 @@ router.delete('/:id', passport.authenticate('jwt', { session: false }), async fu
             return res.status(404).json({ message: 'Target not found' });
         }
 
-        await publish("target.events", { message: "target.deleted", target });
+        await publish("target.events", { type: "target.deleted", data:target });
 
         res.status(200).json({ message: 'Target deleted', target });
     } catch (err) {

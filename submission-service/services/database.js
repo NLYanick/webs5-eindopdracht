@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
-const url = `${process.env.DB_URL}/${process.env.DB_NAME_TARGET}` || 'mongodb://localhost:27017/mydb';
+const url = `${process.env.DB_URL}/${process.env.DB_NAME_SUBMISSION}` || 'mongodb://localhost:27017/mydb';
 mongoose.connect(url);
 
-const targetSubmissionsSchema = new mongoose.Schema({
+const submissionsSchema = new mongoose.Schema({
     targetId: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Target' 
@@ -12,23 +12,26 @@ const targetSubmissionsSchema = new mongoose.Schema({
         type: String, 
         ref: 'User' 
     },
-    imageName: { 
+    photoUrl: { 
         type: String, 
         required: true 
     },
-    score: Number,
     createdAt: {
         type: Date,
         default: Date.now
     }
 });
 
-mongoose.model('TargetSubmission', targetSubmissionsSchema);
+mongoose.model('Submission', submissionsSchema);
 
 
-const targetIdsSchema = new mongoose.Schema({
-    targetId: String,
-    photoUrl: String,
+const targetsSchema = new mongoose.Schema({
+    status: {
+        type: String,
+        enum: ['OPEN', 'CLOSED'],
+        default: 'OPEN',
+        index: true
+    },
 });
 
-mongoose.model('TargetId', targetIdsSchema);
+mongoose.model('Target', targetsSchema);
