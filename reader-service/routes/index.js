@@ -64,6 +64,29 @@ router.get('/targets/:id/submissions/my', passport.authenticate('jwt', { session
     }
 });
 
+// GET /reader/targets/:id/submissions/my - get current user's submissions for a target
+router.get('/targets/:id/submissions/:fileName', passport.authenticate('jwt', { session: false }), async function (req, res, next) {
+    try {
+    const photoUrl = req.params.fileName;
+    if (!photoUrl) return res.status(400).json({ message: 'Photo url is required' });
+    
+    const submission = await Submission.findOne({ photoUrl: photoUrl });
+
+    if (!submission) return res.status(404).json({ message: 'Submission not found' });
+
+    res.status(200).json({ submission: {
+        imageName: submission.imageName,
+        targetId: submission.targetId,
+        score: submission.score || null
+        } 
+    });
+    } 
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 // GET /reader/scores/:targetId
 router.get('/scores/:targetId', passport.authenticate('jwt', { session: false }), async function (req, res, next) {
     try {
