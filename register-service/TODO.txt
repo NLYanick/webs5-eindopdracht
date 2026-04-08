@@ -1,0 +1,45 @@
+Autorisatie
+Check of de user al is ingeschreven voor de target
+Check of de user al is geregistreerd in de auth service
+
+
+
+Autorisatie:
+Owner => orginizerId === req.user.sub
+Participant => Registration exists in DB (Simple query => "SELECT 1 FROM registrations WHERE user_id = ? AND target_id = ? LIMIT 1;")
+
+```
+user.use('target-owner', (req) => {
+  if (req.target && req.target.ownerId === req.user.sub) return true;
+});
+
+user.use('target-participant', (req) => {
+  if (req.isRegistered) return true;
+});
+
+
+
+const registration = await db.Registration.findOne({
+    where: { 
+        targetId: targetId, 
+        userId: req.user.id // From your JWT
+    }
+});
+
+// Maak misschien een method in de utils class die dit doet:
+async (req, res, next) => {
+    const targetId = req.params.targetId;
+    if (!targetId) return next();
+
+    // Perform ONE lean query to get the target and the registration status
+    const registration = await db.Registration.findOne({
+        where: { 
+            targetId: targetId, 
+            userId: req.user.id // From your JWT
+        }
+    });
+
+    // Attach the result to the request object
+    req.isRegistered = Boolean(registration); 
+    next();
+};
