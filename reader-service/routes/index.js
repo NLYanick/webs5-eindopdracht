@@ -94,7 +94,7 @@ router.get('/scores/:targetId', passport.authenticate('jwt', { session: false })
         res.status(200).json({
             scores: submissions.map(sub => ({
                 score: sub.score,
-                userUid: sub.userUid
+                photoUrl: sub.photoUrl
             }))
         });
     } catch (err) {
