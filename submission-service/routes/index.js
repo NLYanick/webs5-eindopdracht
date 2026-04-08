@@ -12,7 +12,7 @@ const { publish } = require('../../pubsub.js');
 const Submission = mongoose.model('Submission');
 const Target = mongoose.model('Target');
 
-router.post('/', uploads.single('photo'), passport.authenticate('jwt', { session: false }), roles.can('participant'), async function (req, res, next) {
+router.post('/', uploads.single('photo'), passport.authenticate('jwt', { session: false }), async function (req, res, next) {
   try {
     if (!req.file) return res.status(400).json({ message: 'File is required' });
 

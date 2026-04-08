@@ -21,3 +21,26 @@ const targetSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 mongoose.model('Target', targetSchema);
+
+const submissionsSchema = new mongoose.Schema({
+    targetId: { 
+        type: mongoose.Schema.Types.ObjectId, 
+    },
+    userUid: { 
+        type: String, 
+    },
+    photoUrl: { 
+        type: String, 
+        required: true 
+    },
+    score: {
+        type: Number,
+        default: null
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+mongoose.model('Submission', submissionsSchema);
