@@ -14,7 +14,6 @@ async function startConsumers() {
         if (msg.type === 'submission.created') {
             try {
                 const submission = msg.data;
-                console.log(submission);
                 const imageName = submission.imageName;
 
                 const uploadsDir = path.join(__dirname, '../../public/uploads');
@@ -97,6 +96,25 @@ async function startConsumers() {
             } catch (error) {
                 console.error("Error saving target deletion:", error);
             }
+        }
+        if (msg.type === 'target.closed') {
+            try {
+                const targetId = msg.data.id;
+                if(!targetId) return;
+                const topScore = await Score.findOne({ targetId: msg.data.id })
+                .sort({ score: -1, createdAt: 1 });
+                if(topScore)
+                {
+                    await publish('score.events', {
+                        type: 'score.winner',
+                        data:{
+                            topScore
+                        }
+                });
+                }
+            } catch (error) {
+                console.error("Error while setting winner:", error);
+            }  
         }
     });
 }
