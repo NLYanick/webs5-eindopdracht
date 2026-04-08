@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
-const circuitBreaker = require('./circuit-breaker');
-const Target = mongoose.model('Target');
 
-// TODO
+const Target = mongoose.model('Target');
+const Register = mongoose.model('Register');
 
 async function fetchTargetId(req, res, next) {
     try {
@@ -20,16 +19,9 @@ async function fetchTargetId(req, res, next) {
 
 async function isRegistered(req, res, next) {
     try {
-        const { json, status } = await circuitBreaker.fire(
-            'get',
-            process.env.REGISTER_SERVICE,
-            `targets/${req.params.targetId}/registers/check`,
-            null,
-            { authorization: req.headers.authorization }
-        );
+        const registerExists = await Register.exists({ targetId: req.params.targetId, userUid: req.user.sub }).lean();
 
-        req.isRegistered = (status === 200 && json.register) ? true : false;
-
+        req.isRegistered = registerExists ? true : false;
         next();
     } catch (error) {
         console.error('Registration check failed:', error);

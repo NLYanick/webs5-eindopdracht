@@ -10,9 +10,20 @@ const scoreSchema = new mongoose.Schema({
     score: Number,
 }, { timestamps: true });
 
+mongoose.model('Score', scoreSchema);
+
+
 const targetSchema = new mongoose.Schema({
     photoUrl: { type: String, required: false },
+    organizerId: String
 }, { timestamps: false });
 
 mongoose.model('Target', targetSchema);
-mongoose.model('Score', scoreSchema);
+
+
+const registersSchema = new mongoose.Schema({
+    targetId: String,
+    userUid: String
+});
+
+mongoose.model('Register', registersSchema);

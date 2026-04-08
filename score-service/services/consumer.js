@@ -5,6 +5,7 @@ const circuitBreaker = require("./circuit-breaker");
 
 const Target = mongoose.model('Target');
 const Score = mongoose.model('Score');
+const Register = mongoose.model('Register');
 
 const fs = require('fs');
 const path = require('path');
@@ -15,20 +16,20 @@ async function startConsumers() {
             try {
                 const submission = msg.data;
                 console.log(submission);
-                const imageName = submission.imageName;
+                const photoUrl = submission.photoUrl;
 
                 const uploadsDir = path.join(__dirname, '../../public/uploads');
                 const target = await Target.findOne({ _id: submission.targetId });
                 if(!target) return;
 
                 const targetBuffer = fs.readFileSync(path.join(uploadsDir, target.photoUrl));
-                const submissionBuffer = fs.readFileSync(path.join(uploadsDir, imageName));
+                const submissionBuffer = fs.readFileSync(path.join(uploadsDir, photoUrl));
 
                 const targetFormData = new FormData();
                 targetFormData.append('image', new Blob([targetBuffer]), { filename: target.photoUrl });
 
                 const submissionFormData = new FormData();
-                submissionFormData.append('image', new Blob([submissionBuffer]), { filename: imageName });
+                submissionFormData.append('image', new Blob([submissionBuffer]), { filename: photoUrl });
 
                 const [submissionResult, targetResult] = await Promise.all([
                     circuitBreaker.fire(
@@ -71,7 +72,7 @@ async function startConsumers() {
                     await publish('score.events', {
                         type: 'score.created',
                         data:{
-                        imageName,
+                        photoUrl,
                         userUid: submission.userUid,
                         score,
                         targetId: submission.targetId
@@ -86,16 +87,32 @@ async function startConsumers() {
     await consume('target.events', async (msg) => {
         if (msg.type === 'target.created') {
             try {
-                await Target.create({ _id: msg.data.id, photoUrl: msg.data.photoUrl });
+                await Target.create({ _id: msg.data.id, photoUrl: msg.data.photoUrl, organizerId: msg.data.organizerId });
             } catch (error) {
                 console.error("Error saving target creation:", error);
             }
         }
         if (msg.type === 'target.deleted') {
             try {
-                await Target.deleteOne({ _id: msg.data.id });
+                await Target.deleteOne({ _id: msg.data._id });
             } catch (error) {
                 console.error("Error saving target deletion:", error);
+            }
+        }
+    });
+    await consume('register.events', async (msg) => {
+        if (msg.type === 'register.created') {
+            try {
+                await Register.create({ targetId: msg.data.targetId, userUid: msg.data.userUid });
+            } catch (error) {
+                console.error("Error saving register creation:", error);
+            }
+        }
+        if (msg.type === 'register.deleted') {
+            try {
+                await Register.deleteOne({ _id: msg.data.id });
+            } catch (error) {
+                console.error("Error saving register deletion:", error);
             }
         }
     });

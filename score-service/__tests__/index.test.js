@@ -42,8 +42,8 @@ describe('Score Service Routes', () => {
     it('should return scores for a target', async () => {
       const mockSubmissions = {
         images: [
-          { imageName: 'image1.jpg', score: 85, userUid: 'user-1' },
-          { imageName: 'image2.jpg', score: 92, userUid: 'user-2' }
+          { photoUrl: 'image1.jpg', score: 85, userUid: 'user-1' },
+          { photoUrl: 'image2.jpg', score: 92, userUid: 'user-2' }
         ]
       };
 
@@ -117,8 +117,8 @@ describe('Score Service Routes', () => {
     it('should return user submissions', async () => {
       const mockUserSubmissions = {
         images: [
-          { imageName: 'user-image1.jpg', score: 88 },
-          { imageName: 'user-image2.jpg', score: 91 }
+          { photoUrl: 'user-image1.jpg', score: 88 },
+          { photoUrl: 'user-image2.jpg', score: 91 }
         ]
       };
 

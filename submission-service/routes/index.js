@@ -8,12 +8,12 @@ const passport = require('../../passport-config.js');
 const roles = require('../services/roles.js');
 const uploads = require('../services/uploads.js');
 const { publish } = require('../../pubsub.js');
-const { isRegistered } = require('../services/middleware.js');
+const { isRegistered, fetchTargetId, isRegisteredAndFetchTargetId } = require('../services/middleware.js');
 
 const Submission = mongoose.model('Submission');
 const Target = mongoose.model('Target');
 
-router.post('/', uploads.single('photo'), passport.authenticate('jwt', { session: false }), roles.can('target-participant'), async function (req, res, next) {
+router.post('/', passport.authenticate('jwt', { session: false }), isRegistered, roles.can('target-participant'), uploads.single('photo'), async function (req, res, next) {
   try {
     if (!req.file) return res.status(400).json({ message: 'File is required' });
 
@@ -27,7 +27,7 @@ router.post('/', uploads.single('photo'), passport.authenticate('jwt', { session
     const submission = await Submission.create({
       targetId: targetId,
       userUid: req.user.sub,
-      imageName: imagePath,
+      photoUrl: imagePath,
     });
 
     await publish('submission.events', {type: "submission.created", data: submission });
@@ -39,24 +39,26 @@ router.post('/', uploads.single('photo'), passport.authenticate('jwt', { session
   }
 });
 
-router.delete('/:filename', passport.authenticate('jwt', { session: false }), roles.can('target-participant'), async function (req, res, next) {
+router.delete('/:filename', passport.authenticate('jwt', { session: false }), isRegisteredAndFetchTargetId, roles.can('submission-deleter'), async function (req, res, next) {
   try {
     const photoName = req.params.filename;
 
     if (!photoName) return res.status(400).json({ message: 'Photo name is required' });
 
-    const submissionExists = await Submission.exists({ imageName: photoName });
+    const submissionExists = await Submission.exists({ photoUrl: photoName });
     if (!submissionExists) return res.status(404).json({ message: 'Submission not found' });
 
-    const submission = await Submission.findOneAndDelete({ imageName: `${photoName}` });
+    const submission = await Submission.findOneAndDelete({ photoUrl: photoName });
 
     const filePath = path.join('public/uploads', photoName);
     fs.unlink(filePath, (err) => {
       if (err) console.error('Error deleting file:', err);
     });
+
     if(submission){
       await publish('submission.events', {type: "submission.deleted", data: submission });
     }
+    
     res.status(204).json({ message: 'Submission deleted' });
   } catch (error) {
     console.error(error);
@@ -64,14 +66,14 @@ router.delete('/:filename', passport.authenticate('jwt', { session: false }), ro
   }
 });
 
-router.get('/', passport.authenticate('jwt', { session: false }), roles.can('target-participant'), async function (req, res, next) {
+router.get('/', passport.authenticate('jwt', { session: false }), fetchTargetId, roles.can('target-owner'), async function (req, res, next) {
   try {
     const targetId = req.params.targetId;
     const submissions = await Submission.find({ _id: targetId });
 
     res.status(200).json({
       images: submissions.map(subm => ({
-        imageName: subm.imageName,
+        photoUrl: subm.photoUrl,
         targetId: subm.targetId,
         score: subm.score || null,
         userUid: subm.userUid
@@ -92,7 +94,7 @@ router.get('/user', passport.authenticate('jwt', { session: false }), isRegister
 
     res.status(200).json({
       images: submissions.map(subm => ({
-        imageName: subm.imageName,
+        photoUrl: subm.photoUrl,
         targetId: subm.targetId,
         score: subm.score || null
       }))
@@ -103,17 +105,17 @@ router.get('/user', passport.authenticate('jwt', { session: false }), isRegister
   }
 });
 
-router.get('/:filename', passport.authenticate('jwt', { session: false }), roles.can('target-participant'), async function (req, res, next) {
+router.get('/:filename', passport.authenticate('jwt', { session: false }), isRegistered, roles.can('target-participant'), async function (req, res, next) {
   try {
     const photoName = req.params.filename;
     if (!photoName) return res.status(400).json({ message: 'Photo name is required' });
     
-    const submission = await Submission.findOne({ imageName: photoName });
+    const submission = await Submission.findOne({ photoUrl: photoName });
 
     if (!submission) return res.status(404).json({ message: 'Submission not found' });
 
     res.status(200).json({ submission: {
-        imageName: submission.imageName,
+        photoUrl: submission.photoUrl,
         targetId: submission.targetId,
         score: submission.score || null
       } });

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router({ mergeParams: true });
 
 const passport = require('../../passport-config.js');
+const { publish } = require('../../pubsub.js');
 
 const mongoose = require('mongoose');
 const Registers = mongoose.model('Registers');
@@ -19,6 +20,8 @@ router.post('/', passport.authenticate('jwt', { session: false }), async functio
   });
 
   res.status(201).json({ message: 'Successfully registered for service!', register });
+
+  publish('register.events', { type: 'register.created', data: register });
 });
 
 router.get('/check', passport.authenticate('jwt', { session: false }), async function(req, res, next) {

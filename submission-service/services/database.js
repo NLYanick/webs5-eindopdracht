@@ -30,6 +30,15 @@ const targetsSchema = new mongoose.Schema({
         default: 'OPEN',
         index: true
     },
+    organizerId: String
 });
 
 mongoose.model('Target', targetsSchema);
+
+
+const registersSchema = new mongoose.Schema({
+    targetId: String,
+    userUid: String
+});
+
+mongoose.model('Register', registersSchema);

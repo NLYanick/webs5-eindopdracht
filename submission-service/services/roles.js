@@ -16,5 +16,10 @@ roles.use('target-participant', req => {
         return req.isRegistered;
     }
 });
+roles.use('submission-deleter', req => {
+    if (req.user && roles.isAuthenticated()) {
+        return req.user.sub === req.targetOrganizerId || req.isRegistered;
+    }
+});
 
 module.exports = roles;

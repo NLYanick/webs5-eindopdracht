@@ -45,7 +45,6 @@ router.post('/', uploads.single('target-photo'), passport.authenticate('jwt', { 
         
         const {
             title,
-            organizerId,
             city,
             lat,
             lng,
@@ -55,7 +54,7 @@ router.post('/', uploads.single('target-photo'), passport.authenticate('jwt', { 
 
         const target = new Target({
             title,
-            organizerId,
+            organizerId: req.user.sub,
             photoUrl: req.file.filename,
             city,
             lat,

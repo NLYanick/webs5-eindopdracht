@@ -14,7 +14,7 @@ router.get('/:targetId', passport.authenticate('jwt', { session: false }), roles
   
   if(!json || status !== 200) return res.status(status).json({ message: json.message || 'No scores found for this target' });
 
-  res.json({ message: 'Successfully retrieved scores', images: json.images.map(image => ({ name: image.imageName, score: image.score, userUid: image.userUid })) });
+  res.json({ message: 'Successfully retrieved scores', images: json.images.map(image => ({ name: image.photoUrl, score: image.score, userUid: image.userUid })) });
 });
 router.get('/:targetId/my-submissions', passport.authenticate('jwt', { session: false }), roles.can('target-participant'), async (req, res, next) => {
   const userUid = req.user.sub;
@@ -26,7 +26,7 @@ router.get('/:targetId/my-submissions', passport.authenticate('jwt', { session: 
   
   if(!json || status !== 200) return res.status(status).json({ message: json.message || 'No scores found for this target' });
 
-  res.json({ message: 'Successfully retrieved scores', images: json.images.map(image => ({ name: image.imageName, score: image.score })) });
+  res.json({ message: 'Successfully retrieved scores', images: json.images.map(image => ({ name: image.photoUrl, score: image.score })) });
 });
 
 module.exports = router;
