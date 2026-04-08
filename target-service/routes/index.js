@@ -8,34 +8,6 @@ const uploads = require('../services/uploads.js');
 const { publish } = require('../../pubsub');
 const Target = require("../services/database.js")
 
-router.get('/', passport.authenticate('jwt', { session: false }), async function(req, res, next) {
-    try {
-        const { city, lat, lng } = req.query;
-
-        let filter = {};
-
-        if (city) {
-            filter.city = { $regex: city, $options: 'i' };
-        }
-
-        if (lat && lng) {
-            filter.lat = { $gte: parseFloat(lat) - radiusInMeter, $lte: parseFloat(lat) + radiusInMeter };
-            filter.lng = { $gte: parseFloat(lng) - radiusInMeter, $lte: parseFloat(lng) + radiusInMeter };
-        }
-
-        const targets = await Target.find(filter);
-
-        if (targets.length === 0) {
-            return res.status(404).json({ message: 'No targets found' });
-        }
-
-        res.status(200).json(targets);
-    } catch (err) {
-        res.status(500).json({ message: 'Internal server error', error: err.message });
-    }
-});
-
-
 router.post('/', uploads.single('target-photo'), passport.authenticate('jwt', { session: false }),async function (req, res) {
     try {
         console.log(req.file, req.body);

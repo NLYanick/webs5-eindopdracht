@@ -6,11 +6,21 @@ const upload = multer();
 const circuitBreaker = require('../services/circuit-breaker');
 
 const submissionService = process.env.SUBMISSION_SERVICE;
+const readerService = process.env.READER_SERVICE;
 
 router.get('/', async (req, res) => {
     try {      
-        const { json, status } = await circuitBreaker.fire("get", submissionService, `targets/${req.params.targetId}/submissions`, null, { authorization: req.headers.authorization });
+        const { json, status } = await circuitBreaker.fire("get", readerService, `reader/targets/${req.params.targetId}/submissions`, null, { authorization: req.headers.authorization });
 
+        res.status(status).json(json);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+router.get('/my', async (req, res) => {
+    try {
+        const { json, status } = await circuitBreaker.fire("get", readerService, `reader/targets/${req.params.targetId}/submissions/my`, null, { authorization: req.headers.authorization });
         res.status(status).json(json);
     } catch (error) {
         console.error(error);
@@ -21,7 +31,7 @@ router.get('/:filename', async (req, res) => {
     try {
         if (!req.params.filename) return res.status(400).json({ message: 'Photo name is required' });
 
-        const { json, status } = await circuitBreaker.fire("get", submissionService, `targets/${req.params.targetId}/submissions/${req.params.filename}`, null, { authorization: req.headers.authorization });
+        const { json, status } = await circuitBreaker.fire("get", readerService, `reader/targets/${req.params.targetId}/submissions/${req.params.filename}`, null, { authorization: req.headers.authorization });
 
         res.status(status).json(json);
     } catch (error) {

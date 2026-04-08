@@ -6,9 +6,9 @@ const roles = new ConnectRoles({
     }
 });
 
-roles.use('participant', req => {
+roles.use('grant', req => {
     if (req.user && roles.isAuthenticated()) {
-        return req.user.roles.includes('participant');
+        return req.user.roles.includes('owner');
     }
 });
 
