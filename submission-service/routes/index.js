@@ -13,7 +13,7 @@ const { isRegistered } = require('../services/middleware.js');
 const TargetSubmission = mongoose.model('TargetSubmission');
 const TargetId = mongoose.model('TargetId');
 
-router.post('/', uploads.single('photo'), passport.authenticate('jwt', { session: false }), roles.can('participant'), async function (req, res, next) {
+router.post('/', uploads.single('photo'), passport.authenticate('jwt', { session: false }), roles.can('target-participant'), async function (req, res, next) {
   try {
     if (!req.file) return res.status(400).json({ message: 'File is required' });
 
@@ -39,7 +39,7 @@ router.post('/', uploads.single('photo'), passport.authenticate('jwt', { session
   }
 });
 
-router.delete('/:filename', passport.authenticate('jwt', { session: false }), roles.can('participant'), async function (req, res, next) {
+router.delete('/:filename', passport.authenticate('jwt', { session: false }), roles.can('target-participant'), async function (req, res, next) {
   try {
     const photoName = req.params.filename;
 
@@ -62,7 +62,7 @@ router.delete('/:filename', passport.authenticate('jwt', { session: false }), ro
   }
 });
 
-router.get('/', passport.authenticate('jwt', { session: false }), roles.can('participant'), async function (req, res, next) {
+router.get('/', passport.authenticate('jwt', { session: false }), roles.can('target-participant'), async function (req, res, next) {
   try {
     const targetId = req.params.targetId;
     const submissions = await TargetSubmission.find({ targetId: targetId });
@@ -101,7 +101,7 @@ router.get('/user', passport.authenticate('jwt', { session: false }), isRegister
   }
 });
 
-router.get('/:filename', passport.authenticate('jwt', { session: false }), roles.can('participant'), async function (req, res, next) {
+router.get('/:filename', passport.authenticate('jwt', { session: false }), roles.can('target-participant'), async function (req, res, next) {
   try {
     const photoName = req.params.filename;
     if (!photoName) return res.status(400).json({ message: 'Photo name is required' });

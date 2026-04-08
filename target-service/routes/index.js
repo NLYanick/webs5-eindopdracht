@@ -1,12 +1,15 @@
 const express = require('express');
 const router = express.Router();
+const fs = require('fs');
+const path = require('path');
 
 const passport = require('../../passport-config.js');
 const roles = require('../services/roles.js');
 const uploads = require('../services/uploads.js');
 
 const { publish } = require('../../pubsub');
-const Target = require("../services/database.js")
+const Target = require("../services/database.js");
+const { fetchTargetId } = require('../services/middleware.js');
 
 router.get('/', passport.authenticate('jwt', { session: false }), async function(req, res, next) {
     try {
@@ -37,9 +40,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), async function
 
 
 router.post('/', uploads.single('target-photo'), passport.authenticate('jwt', { session: false }),async function (req, res) {
-    try {
-        console.log(req.file, req.body);
-        
+    try {        
         if (!req.file) return res.status(400).json({ message: 'File is required' });
         
         const {
@@ -90,11 +91,10 @@ router.post('/', uploads.single('target-photo'), passport.authenticate('jwt', { 
             error: err.message
         });
     }
-    } 
-);
+});
 
 
-router.delete('/:id', passport.authenticate('jwt', { session: false }), async function(req, res, next) {
+router.delete('/:id', passport.authenticate('jwt', { session: false }), fetchTargetId, roles.can('target-owner'), async function(req, res, next) {
     try {
         const target = await Target.findByIdAndDelete(req.params.id);
 
@@ -102,7 +102,12 @@ router.delete('/:id', passport.authenticate('jwt', { session: false }), async fu
             return res.status(404).json({ message: 'Target not found' });
         }
 
-        await publish("target.events", { message: "target.deleted", target });
+        const filePath = path.join('public/uploads', target.photoUrl);
+        fs.unlink(filePath, (err) => {
+            if (err) console.error('Error deleting file:', err);
+        });
+
+        await publish("target.events", { type: "target.deleted", target });
 
         res.status(200).json({ message: 'Target deleted', target });
     } catch (err) {

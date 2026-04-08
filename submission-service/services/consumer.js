@@ -17,11 +17,11 @@ async function startConsumers() {
         try {
             switch (msg.type) {
                 case 'target.created':
-                    await TargetId.create({ targetId: msg.data.id, photoUrl: msg.data.photoUrl });
+                    await TargetId.create({ targetId: msg.data.id, photoUrl: msg.data.photoUrl, organizerId: msg.data.organizerId });
                     break;
                 case 'target.deleted':
-                    await TargetId.deleteOne({ targetId: msg.data.id });
-                    await TargetSubmission.deleteMany({ targetId: msg.data.id });
+                    await TargetId.deleteOne({ targetId: msg.target._id });
+                    await TargetSubmission.deleteMany({ targetId: msg.target._id });
                     break;
                 default:
                     console.warn(`Unhandled event type: ${msg.type}`);

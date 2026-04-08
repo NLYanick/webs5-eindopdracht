@@ -162,7 +162,7 @@ describe('Submission Service Routes', () => {
 
     it('should have mocked roles middleware', () => {
       const rolesMock = require('../services/roles.js');
-      const middleware = rolesMock.can('participant');
+      const middleware = rolesMock.can('target-participant');
 
       expect(typeof middleware).toBe('function');
       middleware(mockReq, mockRes, mockNext);

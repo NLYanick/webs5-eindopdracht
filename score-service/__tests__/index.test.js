@@ -19,7 +19,7 @@ describe('Score Service Routes', () => {
     mockPassport.authenticate = jest.fn().mockReturnValue((req, res, next) => {
       req.user = {
         sub: 'user-123',
-        role: 'participant',
+        role: 'target-participant',
         iat: Math.floor(Date.now() / 1000)
       };
       next();

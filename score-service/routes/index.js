@@ -7,7 +7,7 @@ const circuitBreaker = require('../services/circuit-breaker.js');
 
 const SUBMISSION_SERVICE = process.env.SUBMISSION_SERVICE;
 
-router.get('/:targetId', passport.authenticate('jwt', { session: false }), roles.can('participant'), async (req, res, next) => {
+router.get('/:targetId', passport.authenticate('jwt', { session: false }), roles.can('target-participant'), async (req, res, next) => {
   const targetId = req.params.targetId;
 
   const { json, status } = await circuitBreaker.fire("get", SUBMISSION_SERVICE, `targets/${targetId}/submissions`, null, { authorization: req.headers.authorization })
@@ -16,7 +16,7 @@ router.get('/:targetId', passport.authenticate('jwt', { session: false }), roles
 
   res.json({ message: 'Successfully retrieved scores', images: json.images.map(image => ({ name: image.imageName, score: image.score, userUid: image.userUid })) });
 });
-router.get('/:targetId/my-submissions', passport.authenticate('jwt', { session: false }), roles.can('participant'), async (req, res, next) => {
+router.get('/:targetId/my-submissions', passport.authenticate('jwt', { session: false }), roles.can('target-participant'), async (req, res, next) => {
   const userUid = req.user.sub;
   if (!userUid) return res.status(401).json({ message: 'Unauthorized. Token expired or invalid' });
   
