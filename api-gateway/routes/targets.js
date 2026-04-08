@@ -6,10 +6,11 @@ const upload = multer();
 const circuitBreaker = require('../services/circuit-breaker');
 
 const targetService = process.env.TARGET_SERVICE;
+const readerService = process.env.READER_SERVICE;
 
 router.get('/', async (req, res) => {
     try {
-        const { json, status } = await circuitBreaker.fire("get", targetService, "targets", null, { authorization: req.headers.authorization });
+        const { json, status } = await circuitBreaker.fire("get", readerService, "reader/targets", null, { authorization: req.headers.authorization });
 
         res.status(status).json(json);
     } catch (error) {
@@ -19,6 +20,7 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', upload.single('target-photo'), async (req, res) => {
+    console.log("try")
     try {
         if (!req.file) return res.status(400).json({ message: 'File is required' });
 
