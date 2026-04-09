@@ -26,6 +26,7 @@ mongoose.model('Submission', submissionsSchema);
 
 
 const targetsSchema = new mongoose.Schema({
+    organizerId: { type: String, required: true },
     status: {
         type: String,
         enum: ['OPEN', 'CLOSED'],

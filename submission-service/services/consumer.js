@@ -8,7 +8,7 @@ async function startConsumers() {
     await consume('target.events', async (msg) => {
         if (msg.type === 'target.created') {
             try {
-                await Target.create({ _id: msg.data.id });
+                await Target.create({ _id: msg.data.id, organizerId: msg.data.organizerId });
             } catch (error) {
                 console.error("Error creating target ID:", error);
             }

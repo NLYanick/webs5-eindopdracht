@@ -101,7 +101,7 @@ async function triggerReminder(id) {
     if (!timer || now >= timer.closeAt.getTime()) return;
     await publish("target.events", {
         type: "target.reminder",
-        data: { id }
+        data: { targetId:id}
     });
     setReminder(timer);
 }
