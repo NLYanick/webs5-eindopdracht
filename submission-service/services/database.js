@@ -6,21 +6,19 @@ mongoose.connect(url);
 const submissionsSchema = new mongoose.Schema({
     targetId: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Target' 
+        ref: 'Target',
+        required: true
     },
     userUid: { 
         type: String, 
-        ref: 'User' 
+        ref: 'User',
+        required: true
     },
     imageName: { 
         type: String, 
-        required: true 
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
+        required: true
     }
-});
+}, { timestamps: true });
 
 mongoose.model('Submission', submissionsSchema);
 
@@ -33,6 +31,15 @@ const targetsSchema = new mongoose.Schema({
         default: 'OPEN',
         index: true
     },
+    organizerId: String
 });
 
 mongoose.model('Target', targetsSchema);
+
+
+const registersSchema = new mongoose.Schema({
+    targetId: String,
+    userUid: String
+});
+
+mongoose.model('Register', registersSchema);

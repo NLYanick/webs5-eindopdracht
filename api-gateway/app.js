@@ -8,6 +8,7 @@ const authRouter = require('./routes/auth');
 const submissionsRouter = require('./routes/submissions');
 const targetsRouter = require('./routes/targets');
 const scoresRouter = require('./routes/scores');
+const registersRouter = require('./routes/registers');
 const { checkOpaqueAndReplaceWithJWT } = require('../utils');
 
 const app = express();
@@ -23,6 +24,7 @@ router.use('/auth', authRouter);
 router.use('/uploads', express.static('public/uploads'));
 router.use(checkOpaqueAndReplaceWithJWT);
 router.use('/targets', targetsRouter);
+router.use('/targets/:targetId/registers', registersRouter);
 router.use('/targets/:targetId/submissions', submissionsRouter);
 router.use('/scores', scoresRouter);
 
@@ -30,7 +32,7 @@ app.use('/api/v1', router);
 
 // Other url's go to 404 page
 app.use(function(req, res, next) {
-  res.status(404).json({ message: "Resource not found" });
+  res.status(404).json({ message: "Resource not found", url: req.originalUrl });
 });
 
 // Error handler

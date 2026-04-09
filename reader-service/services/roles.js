@@ -6,9 +6,14 @@ const roles = new ConnectRoles({
     }
 });
 
-roles.use('grant', req => {
+roles.use('target-owner', req => {
     if (req.user && roles.isAuthenticated()) {
-        return req.user.roles.includes('owner');
+        return req.user.sub === req.targetOrganizerId;
+    }
+});
+roles.use('target-participant', req => {
+    if (req.user && roles.isAuthenticated()) {
+        return req.isRegistered;
     }
 });
 

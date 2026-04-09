@@ -68,40 +68,40 @@ describe('Submission Service Routes', () => {
         _id: '123',
         targetId: '456',
         userUid: 'test-user-123',
-        imageName: 'photo-1234567890.jpg'
+        photoUrl: 'photo-1234567890.jpg'
       });
 
       const result = await mockModel.create({
         targetId: '456',
         userUid: 'test-user-123',
-        imageName: 'photo-1234567890.jpg'
+        photoUrl: 'photo-1234567890.jpg'
       });
 
-      expect(result.imageName).toBe('photo-1234567890.jpg');
+      expect(result.photoUrl).toBe('photo-1234567890.jpg');
       expect(mockModel.create).toHaveBeenCalled();
     });
 
     it('should find submissions by user ID', async () => {
       mockModel.find.mockResolvedValue([
-        { imageName: 'photo-1.jpg', targetId: '456', score: 85 },
-        { imageName: 'photo-2.jpg', targetId: '789', score: null }
+        { photoUrl: 'photo-1.jpg', targetId: '456', score: 85 },
+        { photoUrl: 'photo-2.jpg', targetId: '789', score: null }
       ]);
 
       const submissions = await mockModel.find({ userUid: 'test-user-123' });
 
       expect(submissions).toHaveLength(2);
-      expect(submissions[0].imageName).toBe('photo-1.jpg');
+      expect(submissions[0].photoUrl).toBe('photo-1.jpg');
     });
 
     it('should delete submission by image name', async () => {
       mockModel.exists.mockResolvedValue(true);
-      mockModel.findOneAndDelete.mockResolvedValue({ imageName: 'photo.jpg' });
+      mockModel.findOneAndDelete.mockResolvedValue({ photoUrl: 'photo.jpg' });
 
-      const exists = await mockModel.exists({ imageName: 'photo.jpg' });
+      const exists = await mockModel.exists({ photoUrl: 'photo.jpg' });
       expect(exists).toBe(true);
 
-      const deleted = await mockModel.findOneAndDelete({ imageName: 'photo.jpg' });
-      expect(deleted.imageName).toBe('photo.jpg');
+      const deleted = await mockModel.findOneAndDelete({ photoUrl: 'photo.jpg' });
+      expect(deleted.photoUrl).toBe('photo.jpg');
     });
   });
 
@@ -162,7 +162,7 @@ describe('Submission Service Routes', () => {
 
     it('should have mocked roles middleware', () => {
       const rolesMock = require('../services/roles.js');
-      const middleware = rolesMock.can('participant');
+      const middleware = rolesMock.can('target-participant');
 
       expect(typeof middleware).toBe('function');
       middleware(mockReq, mockRes, mockNext);

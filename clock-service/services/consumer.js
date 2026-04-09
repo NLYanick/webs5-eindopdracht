@@ -22,7 +22,7 @@ async function startConsumers() {
             scheduleTimer(timer);
         }
         if (msg.type === 'target.deleted') {
-            const id = msg.id;
+            const id = msg.data._id;
             if (!id) return;
             await cancelTimer(id);
 

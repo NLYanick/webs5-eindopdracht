@@ -58,7 +58,6 @@ async function startConsumers() {
 
                 const score = calculateScore(submissionTags, targetTags);
 
-                
                 const scoreModel = await Score.create({
                     targetId: submission.targetId,
                     submissionId: submission._id,

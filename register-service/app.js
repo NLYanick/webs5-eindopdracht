@@ -1,10 +1,10 @@
 require('dotenv').config();
-require('./services/database.js');
+require('./services/database.js'); // Start database
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
 
-const indexRouter = require('./routes/index.js');
+const indexRouter = require('./routes/index');
 const startConsumers = require('./services/consumer.js');
 
 
@@ -14,8 +14,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use('/reader', indexRouter);
 
+app.use('/targets/:targetId/registers', indexRouter);
 
 async function main() {
   try {
@@ -27,6 +27,7 @@ async function main() {
 
 main();
 
+
 app.use(function(req, res, next) {
   res.status(404).json({ message: "Resource not found" });
 });
@@ -37,5 +38,5 @@ app.use(function(err, req, res, next) {
   res.status(500).json({ message: "Internal Server Error" });
 });
 
-const port = process.env.READER_PORT || 3006;
-app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/reader`));
+const port = process.env.REGISTER_PORT || 3005;
+app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/targets/:targetId/registers`));

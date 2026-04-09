@@ -44,3 +44,10 @@ const submissionsSchema = new mongoose.Schema({
 });
 
 mongoose.model('Submission', submissionsSchema);
+
+const registersSchema = new mongoose.Schema({
+    targetId: String,
+    userUid: String
+});
+
+mongoose.model('Register', registersSchema);

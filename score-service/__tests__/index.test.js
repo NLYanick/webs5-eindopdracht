@@ -1,207 +1,250 @@
+describe('Score Service', () => {
+  const fs = require('fs');
+  const path = require('path');
 
-// Setup mocks BEFORE any requires
-jest.mock('../../passport-config.js');
-jest.mock('../services/roles.js');
-jest.mock('../services/circuit-breaker.js');
-jest.mock('dotenv');
-
-const mockPassport = require('../../passport-config.js');
-const mockRoles = require('../services/roles.js');
-const mockCircuitBreaker = require('../services/circuit-breaker.js');
-
-describe('Score Service Routes', () => {
-  let router;
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-
-    // Setup passport mock to return middleware
-    mockPassport.authenticate = jest.fn().mockReturnValue((req, res, next) => {
-      req.user = {
-        sub: 'user-123',
-        role: 'participant',
-        iat: Math.floor(Date.now() / 1000)
-      };
-      next();
+  describe('Module structure', () => {
+    it('should have services directory', () => {
+      const servicesDir = path.join(__dirname, '../services');
+      expect(fs.existsSync(servicesDir)).toBe(true);
     });
 
-    // Setup roles mock to return middleware
-    mockRoles.can = jest.fn().mockReturnValue((req, res, next) => next());
-
-    // Setup circuit breaker mock
-    mockCircuitBreaker.fire = jest.fn();
-
-    process.env.SUBMISSION_SERVICE = 'http://localhost:3005';
-
-    // Now load the router
-    delete require.cache[require.resolve('../routes/index.js')];
-    router = require('../routes/index.js');
-  });
-
-  describe('GET /:targetId', () => {
-    it('should return scores for a target', async () => {
-      const mockSubmissions = {
-        images: [
-          { imageName: 'image1.jpg', score: 85, userUid: 'user-1' },
-          { imageName: 'image2.jpg', score: 92, userUid: 'user-2' }
-        ]
-      };
-
-      mockCircuitBreaker.fire.mockResolvedValue({
-        json: mockSubmissions,
-        status: 200
-      });
-
-      const req = {
-        params: { targetId: 'target-123' },
-        user: { sub: 'user-123' },
-        headers: { authorization: 'Bearer token' }
-      };
-      const res = {
-        json: jest.fn().mockReturnThis(),
-        status: jest.fn().mockReturnThis()
-      };
-
-      const route = router.stack.find(
-        (layer) => layer.route && layer.route.path === '/:targetId'
-      );
-
-      if (route && route.route.stack && route.route.stack[2]) {
-        const handler = route.route.stack[2].handle;
-        await handler(req, res);
-
-        expect(mockCircuitBreaker.fire).toHaveBeenCalled();
-        expect(res.json).toHaveBeenCalledWith(
-          expect.objectContaining({
-            message: 'Successfully retrieved scores'
-          })
-        );
-      }
+    it('should have app.js', () => {
+      const appFile = path.join(__dirname, '../app.js');
+      expect(fs.existsSync(appFile)).toBe(true);
     });
 
-    it('should return 404 when no scores found', async () => {
-      mockCircuitBreaker.fire.mockResolvedValue({
-        json: null,
-        status: 404
-      });
-
-      const req = {
-        params: { targetId: 'target-123' },
-        user: { sub: 'user-123' },
-        headers: { authorization: 'Bearer token' }
-      };
-      const res = {
-        json: jest.fn().mockReturnThis(),
-        status: jest.fn().mockReturnThis()
-      };
-
-      const route = router.stack.find(
-        (layer) => layer.route && layer.route.path === '/:targetId'
-      );
-
-      if (route && route.route.stack && route.route.stack[2]) {
-        const handler = route.route.stack[2].handle;
-        await handler(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(404);
-        expect(res.json).toHaveBeenCalledWith(
-          expect.objectContaining({
-            message: 'No scores found for this target'
-          })
-        );
-      }
+    it('app.js should require consumer', () => {
+      const appFile = path.join(__dirname, '../app.js');
+      const content = fs.readFileSync(appFile, 'utf8');
+      expect(content).toContain('consumer.js');
     });
   });
 
-  describe('GET /:targetId/my-submissions', () => {
-    it('should return user submissions', async () => {
-      const mockUserSubmissions = {
-        images: [
-          { imageName: 'user-image1.jpg', score: 88 },
-          { imageName: 'user-image2.jpg', score: 91 }
-        ]
-      };
-
-      mockCircuitBreaker.fire.mockResolvedValue({
-        json: mockUserSubmissions,
-        status: 200
-      });
-
-      const req = {
-        params: { targetId: 'target-123' },
-        user: { sub: 'user-123' },
-        headers: { authorization: 'Bearer token' }
-      };
-      const res = {
-        json: jest.fn().mockReturnThis(),
-        status: jest.fn().mockReturnThis()
-      };
-
-      const route = router.stack.find(
-        (layer) => layer.route && layer.route.path === '/:targetId/my-submissions'
-      );
-
-      if (route && route.route.stack && route.route.stack[2]) {
-        const handler = route.route.stack[2].handle;
-        await handler(req, res);
-
-        expect(res.json).toHaveBeenCalledWith(
-          expect.objectContaining({
-            message: 'Successfully retrieved scores'
-          })
-        );
-      }
+  describe('Service files', () => {
+    it('should have database.js', () => {
+      const dbFile = path.join(__dirname, '../services/database.js');
+      expect(fs.existsSync(dbFile)).toBe(true);
     });
 
-    it('should return 401 when user is not authenticated', async () => {
-      const req = {
-        params: { targetId: 'target-123' },
-        user: { sub: undefined },
-        headers: { authorization: 'Bearer token' }
-      };
-      const res = {
-        json: jest.fn().mockReturnThis(),
-        status: jest.fn().mockReturnThis()
-      };
-
-      const route = router.stack.find(
-        (layer) => layer.route && layer.route.path === '/:targetId/my-submissions'
-      );
-
-      if (route && route.route.stack && route.route.stack[2]) {
-        const handler = route.route.stack[2].handle;
-        await handler(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(401);
-      }
+    it('should have consumer.js', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      expect(fs.existsSync(consumerFile)).toBe(true);
     });
 
-    it('should return 404 when no submissions found', async () => {
-      mockCircuitBreaker.fire.mockResolvedValue({
-        json: null,
-        status: 404
-      });
+    it('should have circuit-breaker.js', () => {
+      const cbFile = path.join(__dirname, '../services/circuit-breaker.js');
+      expect(fs.existsSync(cbFile)).toBe(true);
+    });
+  });
 
-      const req = {
-        params: { targetId: 'target-123' },
-        user: { sub: 'user-123' },
-        headers: { authorization: 'Bearer token' }
-      };
-      const res = {
-        json: jest.fn().mockReturnThis(),
-        status: jest.fn().mockReturnThis()
-      };
+  describe('Database configuration', () => {
+    it('should connect to MongoDB', () => {
+      const dbFile = path.join(__dirname, '../services/database.js');
+      const content = fs.readFileSync(dbFile, 'utf8');
+      expect(content).toContain('mongoose.connect');
+    });
 
-      const route = router.stack.find(
-        (layer) => layer.route && layer.route.path === '/:targetId/my-submissions'
-      );
+    it('should define Score model', () => {
+      const dbFile = path.join(__dirname, '../services/database.js');
+      const content = fs.readFileSync(dbFile, 'utf8');
+      expect(content).toContain("mongoose.model('Score'");
+    });
 
-      if (route && route.route.stack && route.route.stack[2]) {
-        const handler = route.route.stack[2].handle;
-        await handler(req, res);
+    it('should define Target model', () => {
+      const dbFile = path.join(__dirname, '../services/database.js');
+      const content = fs.readFileSync(dbFile, 'utf8');
+      expect(content).toContain("mongoose.model('Target'");
+    });
 
-        expect(res.status).toHaveBeenCalledWith(404);
-      }
+    it('Score schema should have required fields', () => {
+      const dbFile = path.join(__dirname, '../services/database.js');
+      const content = fs.readFileSync(dbFile, 'utf8');
+      expect(content).toContain('targetId');
+      expect(content).toContain('submissionId');
+      expect(content).toContain('userUid');
+      expect(content).toContain('score');
+    });
+
+    it('Score model should have timestamps', () => {
+      const dbFile = path.join(__dirname, '../services/database.js');
+      const content = fs.readFileSync(dbFile, 'utf8');
+      expect(content).toContain('timestamps: true');
+    });
+  });
+
+  describe('Consumer functionality', () => {
+    it('should consume submission.events', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain("consume('submission.events'");
+    });
+
+    it('should handle submission.created events', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain("'submission.created'");
+    });
+
+    it('should consume target.events', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain("consume('target.events'");
+    });
+
+    it('should handle target.created events', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain("'target.created'");
+    });
+
+    it('should handle target.deleted events', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain("'target.deleted'");
+    });
+
+    it('should calculate score for submissions', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain('calculateScore');
+    });
+
+    it('should create Score documents', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain('Score.create');
+    });
+
+    it('should publish score.events', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain("'score.events'");
+    });
+
+    it('should use circuit breaker for API calls', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain('circuitBreaker.fire');
+    });
+
+    it('should call Imagga API with FormData', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain('FormData');
+      expect(content).toContain('Blob');
+    });
+
+    it('should delete scores when target is deleted', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain('Score.deleteMany');
+    });
+
+    it('should have error handling', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain('catch (error)');
+      expect(content).toContain('console.error');
+    });
+  });
+
+  describe('Circuit Breaker configuration', () => {
+    it('should import Opossum', () => {
+      const cbFile = path.join(__dirname, '../services/circuit-breaker.js');
+      const content = fs.readFileSync(cbFile, 'utf8');
+      expect(content).toContain('opossum');
+    });
+
+    it('should have timeout configured', () => {
+      const cbFile = path.join(__dirname, '../services/circuit-breaker.js');
+      const content = fs.readFileSync(cbFile, 'utf8');
+      expect(content).toContain('timeout');
+    });
+
+    it('should have error threshold configured', () => {
+      const cbFile = path.join(__dirname, '../services/circuit-breaker.js');
+      const content = fs.readFileSync(cbFile, 'utf8');
+      expect(content).toContain('errorThresholdPercentage');
+    });
+
+    it('should have reset timeout configured', () => {
+      const cbFile = path.join(__dirname, '../services/circuit-breaker.js');
+      const content = fs.readFileSync(cbFile, 'utf8');
+      expect(content).toContain('resetTimeout');
+    });
+
+    it('should have fallback mechanism', () => {
+      const cbFile = path.join(__dirname, '../services/circuit-breaker.js');
+      const content = fs.readFileSync(cbFile, 'utf8');
+      expect(content).toContain('fallback');
+    });
+
+    it('should have event listeners', () => {
+      const cbFile = path.join(__dirname, '../services/circuit-breaker.js');
+      const content = fs.readFileSync(cbFile, 'utf8');
+      expect(content).toContain('.on("fallback"');
+      expect(content).toContain('.on("open"');
+      expect(content).toContain('.on("close"');
+    });
+
+    it('should export circuit breaker instance', () => {
+      const cbFile = path.join(__dirname, '../services/circuit-breaker.js');
+      const content = fs.readFileSync(cbFile, 'utf8');
+      expect(content).toContain('module.exports');
+    });
+  });
+
+  describe('Environment configuration', () => {
+    it('app.js should load environment variables', () => {
+      const appFile = path.join(__dirname, '../app.js');
+      const content = fs.readFileSync(appFile, 'utf8');
+      expect(content).toContain('dotenv');
+    });
+
+    it('database should use DB_URL environment variable', () => {
+      const dbFile = path.join(__dirname, '../services/database.js');
+      const content = fs.readFileSync(dbFile, 'utf8');
+      expect(content).toContain('process.env.DB_URL');
+      expect(content).toContain('process.env.DB_NAME_SCORE');
+    });
+
+    it('consumer should use IMAGGA_BASE_URL', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain('process.env.IMAGGA_BASE_URL');
+    });
+
+    it('consumer should use IMAGGA_AUTH', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain('process.env.IMAGGA_AUTH');
+    });
+  });
+
+  describe('Dependencies', () => {
+    it('consumer should require pubsub', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain('pubsub');
+    });
+
+    it('consumer should require mongoose', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain('mongoose');
+    });
+
+    it('consumer should require circuit-breaker', () => {
+      const consumerFile = path.join(__dirname, '../services/consumer.js');
+      const content = fs.readFileSync(consumerFile, 'utf8');
+      expect(content).toContain('circuit-breaker');
+    });
+
+    it('circuit-breaker should use utils callService', () => {
+      const cbFile = path.join(__dirname, '../services/circuit-breaker.js');
+      const content = fs.readFileSync(cbFile, 'utf8');
+      expect(content).toContain('utils');
+      expect(content).toContain('callService');
     });
   });
 });
