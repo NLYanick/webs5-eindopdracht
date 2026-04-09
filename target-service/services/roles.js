@@ -11,5 +11,10 @@ roles.use('target-owner', req => {
         return req.user.sub === req.targetOrganizerId;
     }
 });
+roles.use('target-participant', req => {
+    if (req.user && roles.isAuthenticated()) {
+        return req.isRegistered;
+    }
+});
 
 module.exports = roles;

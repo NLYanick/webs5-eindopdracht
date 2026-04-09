@@ -1,9 +1,6 @@
-- Autorisatie
-
 - Swagger API Documentation
-- Een paar tests schrijven met Jest
 - Database optimaliseren (CQRS)
 
 - Architectuurplaat
 
-- Alle onderlinge API calls in microservices moeten via een circuit breaker
+- (Laat AI een frontend genereren)

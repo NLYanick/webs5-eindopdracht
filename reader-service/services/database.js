@@ -51,3 +51,14 @@ const registersSchema = new mongoose.Schema({
 });
 
 mongoose.model('Register', registersSchema);
+
+const votesSchema = new mongoose.Schema({
+    targetId: String,
+    userUid: String,
+    vote: {
+        type: String,
+        enum: ['thumbsUp', 'thumbsDown'],
+    }
+});
+
+mongoose.model('Votes', votesSchema);

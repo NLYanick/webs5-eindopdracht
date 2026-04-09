@@ -17,7 +17,32 @@ const targetSchema = new mongoose.Schema({
     city: { type: String, trim: true },
     lat: { type: Number },
     lng: { type: Number },
-    radiusInMeter: { type: Number, default: 500 }
+    radiusInMeter: { type: Number, default: 500 },
 }, { timestamps: true });
 
-module.exports = mongoose.model('Target', targetSchema);
+mongoose.model('Target', targetSchema);
+
+const votesSchema = new mongoose.Schema({
+    targetId: {
+        type: String,
+        required: true,
+    },
+    userUid: {
+        type: String,
+        required: true
+    },
+    vote: {
+        type: String,
+        enum: ['thumbsUp', 'thumbsDown'],
+        required: true
+    }
+});
+
+mongoose.model('Votes', votesSchema);
+
+const registersSchema = new mongoose.Schema({
+    targetId: String,
+    userUid: String
+});
+
+mongoose.model('Register', registersSchema);

@@ -125,7 +125,7 @@ describe('Register Service', () => {
       const dbFile = path.join(__dirname, '../services/database.js');
       const content = fs.readFileSync(dbFile, 'utf8');
       
-      expect(content).toContain("mongoose.model('Registers'");
+      expect(content).toContain("mongoose.model('Register'");
     });
   });
 

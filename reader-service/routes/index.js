@@ -8,6 +8,7 @@ require('../services/database.js');
 const mongoose = require('mongoose');
 const Target = mongoose.model('Target');
 const Submission = mongoose.model('Submission');
+const Votes = mongoose.model('Votes');
 
 const { fetchTargetId, isRegistered } = require('../services/middleware.js');
 
@@ -39,6 +40,23 @@ router.get('/targets', passport.authenticate('jwt', { session: false }), async f
 
         res.status(200).json(targets);
     } catch (err) {
+        res.status(500).json({ message: 'Internal server error', error: err.message });
+    }
+});
+
+// GET /reader/targets/:id/votes
+router.get('/targets/:id/votes', passport.authenticate('jwt', { session: false }), async function(req, res) {
+    try {
+        const targetId = req.params.id;
+
+        const upVotes = await Votes.countDocuments({ targetId: targetId, vote: 'thumbsUp' });
+        const downVotes = await Votes.countDocuments({ targetId: targetId, vote: 'thumbsDown' });
+
+        const result = { thumbsUp: upVotes, thumbsDown: downVotes };
+
+        res.status(200).json({ targetId, votes: result });
+    } catch (err) {
+        console.error('Error retrieving votes:', err);
         res.status(500).json({ message: 'Internal server error', error: err.message });
     }
 });
