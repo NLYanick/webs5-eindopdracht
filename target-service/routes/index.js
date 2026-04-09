@@ -13,10 +13,9 @@ router.post('/', uploads.single('target-photo'), passport.authenticate('jwt', { 
         console.log(req.file, req.body);
         
         if (!req.file) return res.status(400).json({ message: 'File is required' });
-        
+        const organizerId = req.user.sub;
         const {
             title,
-            organizerId,
             city,
             lat,
             lng,

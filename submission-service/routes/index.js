@@ -39,23 +39,31 @@ router.post('/', uploads.single('photo'), passport.authenticate('jwt', { session
   }
 });
 
-router.delete('/:filename', passport.authenticate('jwt', { session: false }), roles.can('participant'), async function (req, res, next) {
+router.delete('/:filename', passport.authenticate('jwt', { session: false }), async function (req, res, next) {
   try {
     const photoName = req.params.filename;
 
     if (!photoName) return res.status(400).json({ message: 'Photo name is required' });
 
-    const submissionExists = await Submission.exists({ imageName: photoName });
-    if (!submissionExists) return res.status(404).json({ message: 'Submission not found' });
+    const existingSubmission = await Submission.findOne({ imageName: photoName });
+    if (!existingSubmission) return res.status(404).json({ message: 'Submission not found' });
 
-    const submission = await Submission.findOneAndDelete({ imageName: `${photoName}` });
+    if(existingSubmission.userUid != req.user.sub){
+      const target = await Target.findById(existingSubmission.targetId);
+
+      if(!target || target.organizerId != req.user.sub){
+        return res.status(403).json({ message: 'Unauthorized to remove this submission' });
+      }
+    }
+
+    const submission = await Submission.deleteMany({_id: existingSubmission._id});
 
     const filePath = path.join('public/uploads', photoName);
     fs.unlink(filePath, (err) => {
       if (err) console.error('Error deleting file:', err);
     });
     if(submission){
-      await publish('submission.events', {type: "submission.deleted", data: submission });
+      await publish('submission.events', {type: "submission.deleted", data: existingSubmission });
     }
     res.status(204).json({ message: 'Submission deleted' });
   } catch (error) {
