@@ -1,6 +1,5 @@
-Merge de Reader Service (development branch) hierin en fix alles
+Doe autorisatie in de reader service
 Als een target wordt verwijderd, moeten alle registers verwijderd worden daarvan
-Als een submission wordt verwijderd, moeten alle scores daarvan verwijderd worden
 Check of de user al is ingeschreven voor de target
 Check of de user al is geregistreerd in de auth service
 Tests fixen

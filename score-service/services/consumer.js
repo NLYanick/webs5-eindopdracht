@@ -22,13 +22,13 @@ async function startConsumers() {
                 if(!target) return;
 
                 const targetBuffer = fs.readFileSync(path.join(uploadsDir, target.photoUrl));
-                const submissionBuffer = fs.readFileSync(path.join(uploadsDir, photoUrl));
+                const submissionBuffer = fs.readFileSync(path.join(uploadsDir, imageName));
 
                 const targetFormData = new FormData();
                 targetFormData.append('image', new Blob([targetBuffer]), { filename: target.photoUrl });
 
                 const submissionFormData = new FormData();
-                submissionFormData.append('image', new Blob([submissionBuffer]), { filename: photoUrl });
+                submissionFormData.append('image', new Blob([submissionBuffer]), { filename: imageName });
 
                 const [submissionResult, targetResult] = await Promise.all([
                     circuitBreaker.fire(
@@ -59,7 +59,6 @@ async function startConsumers() {
 
                 const score = calculateScore(submissionTags, targetTags);
 
-                
                 const scoreModel = await Score.create({
                     targetId: submission.targetId,
                     submissionId: submission._id,
@@ -71,7 +70,7 @@ async function startConsumers() {
                     await publish('score.events', {
                         type: 'score.created',
                         data:{
-                        photoUrl,
+                        imageName,
                         userUid: submission.userUid,
                         score,
                         targetId: submission.targetId

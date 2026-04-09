@@ -26,8 +26,8 @@ async function startConsumers() {
             try {
                 const submission = msg.data;
                 await Submission.create({
-                    photoUrl: msg.data.imageName,
-                    ...msg.data,
+                    photoUrl: submission.imageName,
+                    ...submission,
                 });
             } catch (error) {
                 console.error("Error saving submission creation:", error);
