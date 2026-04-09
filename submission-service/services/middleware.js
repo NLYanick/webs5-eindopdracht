@@ -31,24 +31,7 @@ async function isRegistered(req, res, next) {
     }
 }
 
-async function isRegisteredAndFetchTargetId(req, res, next) {
-    try {
-        const targetIdData = await Target.findById(req.params.targetId).lean(); // `lean()` for plain JS object
-        const registerExists = await Register.exists({ targetId: req.params.targetId, userUid: req.user.sub }).lean();
-        
-        req.targetOrganizerId = targetIdData?.organizerId;
-        req.isRegistered = registerExists ? true : false;
-        next();
-    } catch (error) {
-        console.error('Registration check failed:', error);
-        
-        req.isRegistered = false;
-        next(error);
-    }
-}
-
 module.exports = {
     fetchTargetId,
-    isRegistered,
-    isRegisteredAndFetchTargetId
+    isRegistered
 };

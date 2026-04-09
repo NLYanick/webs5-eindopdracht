@@ -8,7 +8,7 @@ const passport = require('../../passport-config.js');
 const roles = require('../services/roles.js');
 const uploads = require('../services/uploads.js');
 const { publish } = require('../../pubsub.js');
-const { isRegistered, fetchTargetId, isRegisteredAndFetchTargetId } = require('../services/middleware.js');
+const { isRegistered, fetchTargetId } = require('../services/middleware.js');
 
 const Submission = mongoose.model('Submission');
 const Target = mongoose.model('Target');
@@ -39,16 +39,16 @@ router.post('/', passport.authenticate('jwt', { session: false }), isRegistered,
   }
 });
 
-router.delete('/:filename', passport.authenticate('jwt', { session: false }), isRegisteredAndFetchTargetId, roles.can('submission-deleter'), async function (req, res, next) {
+router.delete('/:filename', passport.authenticate('jwt', { session: false }), isRegistered, roles.can('target-participant'), async function (req, res, next) {
   try {
     const photoName = req.params.filename;
 
     if (!photoName) return res.status(400).json({ message: 'Photo name is required' });
 
-    const submissionExists = await Submission.exists({ photoUrl: photoName });
+    const submissionExists = await Submission.exists({ photoUrl: photoName, userUid: req.user.sub });
     if (!submissionExists) return res.status(404).json({ message: 'Submission not found' });
 
-    const submission = await Submission.findOneAndDelete({ photoUrl: photoName });
+    const submission = await Submission.findOneAndDelete({ photoUrl: photoName, userUid: req.user.sub });
 
     const filePath = path.join('public/uploads', photoName);
     fs.unlink(filePath, (err) => {
