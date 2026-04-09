@@ -9,6 +9,8 @@ const mongoose = require('mongoose');
 const Target = mongoose.model('Target');
 const Submission = mongoose.model('Submission');
 
+const { fetchTargetId, isRegistered } = require('../services/middleware.js');
+
 // GET /reader/targets - list targets, filterable by city or lat/lng
 router.get('/targets', passport.authenticate('jwt', { session: false }), async function (req, res, next) {
     try {
@@ -42,7 +44,7 @@ router.get('/targets', passport.authenticate('jwt', { session: false }), async f
 });
 
 // GET /reader/targets/:id/submissions - get all submissions for a target
-router.get('/targets/:id/submissions', passport.authenticate('jwt', { session: false }), async function (req, res, next) {
+router.get('/targets/:id/submissions', passport.authenticate('jwt', { session: false }), fetchTargetId, roles.can('target-owner'), async function (req, res, next) {
     try {
         const submissions = await Submission.find({ targetId: req.params.id });
         res.status(200).json({ submissions });
@@ -52,7 +54,7 @@ router.get('/targets/:id/submissions', passport.authenticate('jwt', { session: f
 });
 
 // GET /reader/targets/:id/submissions/my - get current user's submissions for a target
-router.get('/targets/:id/submissions/my', passport.authenticate('jwt', { session: false }), async function (req, res, next) {
+router.get('/targets/:id/submissions/my', passport.authenticate('jwt', { session: false }), isRegistered, roles.can('target-participant'), async function (req, res, next) {
     try {
         const submissions = await Submission.find({
             targetId: req.params.id,
@@ -64,8 +66,8 @@ router.get('/targets/:id/submissions/my', passport.authenticate('jwt', { session
     }
 });
 
-// GET /reader/targets/:id/submissions/my - get current user's submissions for a target
-router.get('/targets/:id/submissions/:fileName', passport.authenticate('jwt', { session: false }), async function (req, res, next) {
+// GET /reader/targets/:id/submissions/:fileName - get submissions photo for a target
+router.get('/targets/:id/submissions/:fileName', passport.authenticate('jwt', { session: false }), isRegistered, roles.can('target-participant'), async function (req, res, next) {
     try {
     const photoUrl = req.params.fileName;
     if (!photoUrl) return res.status(400).json({ message: 'Photo url is required' });
@@ -88,7 +90,7 @@ router.get('/targets/:id/submissions/:fileName', passport.authenticate('jwt', { 
 });
 
 // GET /reader/scores/:targetId
-router.get('/scores/:targetId', passport.authenticate('jwt', { session: false }), async function (req, res, next) {
+router.get('/scores/:targetId', passport.authenticate('jwt', { session: false }), fetchTargetId, roles.can('target-owner'), async function (req, res, next) {
     try {
         const submissions = await Submission.find({ targetId: req.params.targetId });
         res.status(200).json({

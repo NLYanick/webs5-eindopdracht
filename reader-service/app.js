@@ -38,4 +38,4 @@ app.use(function(err, req, res, next) {
 });
 
 const port = process.env.READER_PORT || 3006;
-app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/targets`));
+app.listen(port, () => console.log(`Listening on port ${port}: http://localhost:${port}/reader`));

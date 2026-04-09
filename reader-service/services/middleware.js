@@ -5,7 +5,8 @@ const Register = mongoose.model('Register');
 
 async function fetchTargetId(req, res, next) {
     try {
-        const targetData = await Target.findById(req.params.targetId).lean(); // `lean()` for plain JS object
+        const targetData = await Target.findById(req.params.id ?? req.params.targetId).lean(); // `lean()` for plain JS object
+        
         req.targetOrganizerId = targetData?.organizerId;
         
         next();
@@ -19,7 +20,7 @@ async function fetchTargetId(req, res, next) {
 
 async function isRegistered(req, res, next) {
     try {
-        const registerExists = await Register.exists({ targetId: req.params.targetId, userUid: req.user.sub }).lean();
+        const registerExists = await Register.exists({ targetId: req.params.id, userUid: req.user.sub }).lean();
 
         req.isRegistered = registerExists ? true : false;
         next();

@@ -4,6 +4,7 @@ require("./database.js");
 
 const Target = mongoose.model("Target");
 const Submission = mongoose.model("Submission");
+const Register = mongoose.model("Register");
 
 async function startConsumers() {
     await consume('target.events', async (msg) => {
@@ -57,6 +58,23 @@ async function startConsumers() {
             }
         } catch (error) {
             console.error(`Error handling score event (${msg.type}):`, error);
+        }
+    });
+
+    await consume('register.events', async (msg) => {
+        if (msg.type === 'register.created') {
+            try {
+                await Register.create({ targetId: msg.data.targetId, userUid: msg.data.userUid });
+            } catch (error) {
+                console.error("Error saving register creation:", error);
+            }
+        }
+        if (msg.type === 'register.deleted') {
+            try {
+                await Register.deleteOne({ _id: msg.data.id });
+            } catch (error) {
+                console.error("Error saving register deletion:", error);
+            }
         }
     });
 }
