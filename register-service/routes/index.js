@@ -5,7 +5,7 @@ const passport = require('../../passport-config.js');
 const { publish } = require('../../pubsub.js');
 
 const mongoose = require('mongoose');
-const Registers = mongoose.model('Registers');
+const Registers = mongoose.model('Register');
 
 router.post('/', passport.authenticate('jwt', { session: false }), async function (req, res, next) {
   try {

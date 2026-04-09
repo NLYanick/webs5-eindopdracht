@@ -5,6 +5,7 @@ require("./database.js");
 const Target = mongoose.model("Target");
 const Submission = mongoose.model("Submission");
 const Register = mongoose.model("Register");
+const Votes = mongoose.model("Votes");
 
 async function startConsumers() {
     await consume('target.events', async (msg) => {
@@ -20,6 +21,17 @@ async function startConsumers() {
         }
         if (msg.type === 'target.closed') {
             await Target.findByIdAndUpdate(msg.data.id, { status: 'CLOSED' });
+        }
+        if (msg.type === 'target.votes') {
+            if(msg.type === 'target.votes.added') {
+                await Votes.create({
+                    targetId: msg.data.targetId,
+                    vote: msg.data.vote
+                });
+            }
+            if(msg.type === 'target.votes.removed') {
+                await Votes.deleteOne({_id: msg.data._id});
+            }
         }
     });
     await consume('submission.events', async (msg) => {

@@ -15,4 +15,4 @@ const registersSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-mongoose.model('Registers', registersSchema);
+mongoose.model('Register', registersSchema);
