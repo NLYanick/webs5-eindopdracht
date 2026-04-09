@@ -5,7 +5,6 @@ const circuitBreaker = require("./circuit-breaker");
 
 const Target = mongoose.model('Target');
 const Score = mongoose.model('Score');
-const Register = mongoose.model('Register');
 
 const fs = require('fs');
 const path = require('path');
@@ -85,7 +84,7 @@ async function startConsumers() {
     await consume('target.events', async (msg) => {
         if (msg.type === 'target.created') {
             try {
-                await Target.create({ _id: msg.data.id, photoUrl: msg.data.photoUrl, organizerId: msg.data.organizerId });
+                await Target.create({ _id: msg.data.id, photoUrl: msg.data.photoUrl });
             } catch (error) {
                 console.error("Error saving target creation:", error);
             }
@@ -124,22 +123,6 @@ async function startConsumers() {
                 await Score.deleteMany({ submissionId: msg.data.id });
             } catch (error) {
                 console.error("Error saving submission deletion:", error);
-            }
-        }
-    });
-    await consume('register.events', async (msg) => {
-        if (msg.type === 'register.created') {
-            try {
-                await Register.create({ _id: msg.data._id, targetId: msg.data.targetId, userUid: msg.data.userUid });
-            } catch (error) {
-                console.error("Error saving register creation:", error);
-            }
-        }
-        if (msg.type === 'register.deleted') {
-            try {                
-                await Register.deleteOne({ _id: msg.data._id });
-            } catch (error) {
-                console.error("Error saving register deletion:", error);
             }
         }
     });

@@ -56,12 +56,6 @@ describe('Score Service', () => {
       expect(content).toContain("mongoose.model('Target'");
     });
 
-    it('should define Register model', () => {
-      const dbFile = path.join(__dirname, '../services/database.js');
-      const content = fs.readFileSync(dbFile, 'utf8');
-      expect(content).toContain("mongoose.model('Register'");
-    });
-
     it('Score schema should have required fields', () => {
       const dbFile = path.join(__dirname, '../services/database.js');
       const content = fs.readFileSync(dbFile, 'utf8');
