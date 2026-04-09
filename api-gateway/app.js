@@ -32,7 +32,7 @@ app.use('/api/v1', router);
 
 // Other url's go to 404 page
 app.use(function(req, res, next) {
-  res.status(404).json({ message: "Resource not found" });
+  res.status(404).json({ message: "Resource not found", url: req.originalUrl });
 });
 
 // Error handler

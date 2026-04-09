@@ -1,4 +1,3 @@
-Als een target wordt verwijderd, moeten alle registers verwijderd worden daarvan
 Check of de user al is ingeschreven voor de target
 Check of de user al is geregistreerd in de auth service
 Tests fixen

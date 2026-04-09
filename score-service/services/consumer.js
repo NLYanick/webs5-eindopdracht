@@ -130,14 +130,16 @@ async function startConsumers() {
     await consume('register.events', async (msg) => {
         if (msg.type === 'register.created') {
             try {
-                await Register.create({ targetId: msg.data.targetId, userUid: msg.data.userUid });
+                await Register.create({ _id: msg.data._id, targetId: msg.data.targetId, userUid: msg.data.userUid });
             } catch (error) {
                 console.error("Error saving register creation:", error);
             }
         }
         if (msg.type === 'register.deleted') {
             try {
-                await Register.deleteOne({ _id: msg.data.id });
+                console.log(msg.data);
+                
+                await Register.deleteOne({ _id: msg.data._id });
             } catch (error) {
                 console.error("Error saving register deletion:", error);
             }
