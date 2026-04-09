@@ -23,10 +23,13 @@ async function startConsumers() {
             await Target.findByIdAndUpdate(msg.data.id, { status: 'CLOSED' });
         }
         if(msg.type === 'target.votes.added') {
-            await Votes.create({
+            await Votes.updateOne({
                 targetId: msg.data.targetId,
+                userUid: msg.data.userUid
+            }, {
+                _id: msg.data._id,
                 vote: msg.data.vote
-            });
+            }, { upsert: true }); // Create a new vote if it doesn't exist
         }
         if(msg.type === 'target.votes.removed') {
             await Votes.deleteOne({_id: msg.data._id});

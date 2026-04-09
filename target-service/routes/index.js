@@ -112,7 +112,9 @@ router.post('/:id/vote', passport.authenticate('jwt', { session: false }), isReg
         await publish('target.events', {
             type: 'target.votes.added',
             data: {
+                _id: rating._id.toString(),
                 targetId,
+                userUid,
                 vote
             }
         });
@@ -136,7 +138,7 @@ router.delete('/:id/vote', passport.authenticate('jwt', { session: false }), isR
         await publish('target.events', {
             type: 'target.votes.removed',
             data: {
-                _id: vote._id
+                _id: vote._id.toString()
             }
         });
     } catch (err) {
