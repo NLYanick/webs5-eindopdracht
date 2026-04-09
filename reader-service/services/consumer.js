@@ -22,16 +22,14 @@ async function startConsumers() {
         if (msg.type === 'target.closed') {
             await Target.findByIdAndUpdate(msg.data.id, { status: 'CLOSED' });
         }
-        if (msg.type === 'target.votes') {
-            if(msg.type === 'target.votes.added') {
-                await Votes.create({
-                    targetId: msg.data.targetId,
-                    vote: msg.data.vote
-                });
-            }
-            if(msg.type === 'target.votes.removed') {
-                await Votes.deleteOne({_id: msg.data._id});
-            }
+        if(msg.type === 'target.votes.added') {
+            await Votes.create({
+                targetId: msg.data.targetId,
+                vote: msg.data.vote
+            });
+        }
+        if(msg.type === 'target.votes.removed') {
+            await Votes.deleteOne({_id: msg.data._id});
         }
     });
     await consume('submission.events', async (msg) => {

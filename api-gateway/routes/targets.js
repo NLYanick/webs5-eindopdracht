@@ -76,7 +76,7 @@ router.post('/:id/vote', async (req, res) => {
 });
 router.delete('/:id/vote', async (req, res) => {
     try {
-        const { json, status } = await circuitBreaker.fire("delete", targetService, `targets/${req.params.id}/vote`, null, { authorization: req.headers.authorization });
+        const { json, status } = await circuitBreaker.fire("delete", targetService, `reader/targets/${req.params.id}/vote`, null, { authorization: req.headers.authorization });
 
         res.status(status).json(json);
     } catch (error) {

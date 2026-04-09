@@ -36,7 +36,7 @@ const votesSchema = new mongoose.Schema({
         enum: ['thumbsUp', 'thumbsDown'],
         required: true
     }
-}, { timestamps: true });
+});
 
 mongoose.model('Votes', votesSchema);
 
