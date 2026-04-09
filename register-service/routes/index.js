@@ -15,6 +15,9 @@ router.post('/', passport.authenticate('jwt', { session: false }), async functio
     if (!targetId) return res.status(400).json({ message: 'Target ID is required' });
     if (!userUid) return res.status(400).json({ message: 'User UID is required' });
 
+    const existingRegister = await Registers.findOne({ targetId, userUid }).lean();
+    if (existingRegister) return res.status(400).json({ message: 'User is already registered for this target' });
+
     const register = await Registers.create({
       targetId,
       userUid
@@ -35,6 +38,9 @@ router.delete('/', passport.authenticate('jwt', { session: false }), async funct
 
     if (!targetId) return res.status(400).json({ message: 'Target ID is required' });
     if (!userUid) return res.status(400).json({ message: 'User UID is required' });
+
+    const existingRegister = await Registers.findOne({ targetId, userUid }).lean();
+    if (!existingRegister) return res.status(400).json({ message: 'User is not registered for this target' });
 
     const register = await Registers.findOneAndDelete({
       targetId,

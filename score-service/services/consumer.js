@@ -136,9 +136,7 @@ async function startConsumers() {
             }
         }
         if (msg.type === 'register.deleted') {
-            try {
-                console.log(msg.data);
-                
+            try {                
                 await Register.deleteOne({ _id: msg.data._id });
             } catch (error) {
                 console.error("Error saving register deletion:", error);

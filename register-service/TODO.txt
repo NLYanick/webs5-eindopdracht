@@ -1,3 +1,2 @@
-Check of de user al is ingeschreven voor de target
 Check of de user al is geregistreerd in de auth service
 Tests fixen
