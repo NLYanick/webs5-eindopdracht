@@ -54,7 +54,7 @@ router.get('/targets/:id/votes', passport.authenticate('jwt', { session: false }
 
         const result = { thumbsUp: upVotes, thumbsDown: downVotes };
 
-        res.status(200).json({ votes: result });
+        res.status(200).json({ targetId, votes: result });
     } catch (err) {
         console.error('Error retrieving votes:', err);
         res.status(500).json({ message: 'Internal server error', error: err.message });

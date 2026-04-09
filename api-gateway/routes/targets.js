@@ -53,9 +53,10 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
+// Votes
 router.get('/:id/votes', async (req, res) => {
     try {
-        const { json, status } = await circuitBreaker.fire("get", targetService, `targets/${req.params.id}/votes`, null, { authorization: req.headers.authorization });
+        const { json, status } = await circuitBreaker.fire("get", readerService, `reader/targets/${req.params.id}/votes`, null, { authorization: req.headers.authorization });
 
         res.status(status).json(json);
     } catch (error) {
@@ -63,6 +64,7 @@ router.get('/:id/votes', async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
+
 router.post('/:id/vote', async (req, res) => {
     try {
         if(!req.body) return res.status(400).json({ message: "'vote' field is required" });
@@ -74,9 +76,10 @@ router.post('/:id/vote', async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
+
 router.delete('/:id/vote', async (req, res) => {
     try {
-        const { json, status } = await circuitBreaker.fire("delete", targetService, `reader/targets/${req.params.id}/vote`, null, { authorization: req.headers.authorization });
+        const { json, status } = await circuitBreaker.fire("delete", targetService, `targets/${req.params.id}/vote`, null, { authorization: req.headers.authorization });
 
         res.status(status).json(json);
     } catch (error) {
