@@ -5,6 +5,7 @@ require("./database.js");
 const Target = mongoose.model("Target");
 const Submission = mongoose.model("Submission");
 const Register = mongoose.model("Register");
+const Votes = mongoose.model("Votes");
 
 async function startConsumers() {
     await consume('target.events', async (msg) => {
@@ -20,6 +21,18 @@ async function startConsumers() {
         }
         if (msg.type === 'target.closed') {
             await Target.findByIdAndUpdate(msg.data.id, { status: 'CLOSED' });
+        }
+        if(msg.type === 'target.votes.added') {
+            await Votes.updateOne({
+                targetId: msg.data.targetId,
+                userUid: msg.data.userUid
+            }, {
+                _id: msg.data._id,
+                vote: msg.data.vote
+            }, { upsert: true }); // Create a new vote if it doesn't exist
+        }
+        if(msg.type === 'target.votes.removed') {
+            await Votes.deleteOne({_id: msg.data._id});
         }
     });
     await consume('submission.events', async (msg) => {
