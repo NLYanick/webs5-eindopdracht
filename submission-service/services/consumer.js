@@ -16,7 +16,7 @@ async function startConsumers() {
         }
         if (msg.type === 'target.deleted') {
             try {
-                await Target.deleteOne({ _id: msg.data._id });
+                await Target.deleteOne({ _id: msg.data.id });
                 await Submission.deleteMany({ targetId: msg.data.id });
             } catch (error) {
                 console.error("Error creating target ID:", error);

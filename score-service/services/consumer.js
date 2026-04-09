@@ -15,7 +15,7 @@ async function startConsumers() {
         if (msg.type === 'submission.created') {
             try {
                 const submission = msg.data;
-                const photoUrl = submission.photoUrl;
+                const imageName = submission.imageName;
 
                 const uploadsDir = path.join(__dirname, '../../public/uploads');
                 const target = await Target.findOne({ _id: submission.targetId });
@@ -93,9 +93,38 @@ async function startConsumers() {
         }
         if (msg.type === 'target.deleted') {
             try {
-                await Target.deleteOne({ _id: msg.data._id });
+                await Target.deleteOne({ _id: msg.data.id });
+                await Score.deleteMany({ targetId: msg.data.id });
             } catch (error) {
                 console.error("Error saving target deletion:", error);
+            }
+        }
+        if (msg.type === 'target.closed') {
+            try {
+                const targetId = msg.data.id;
+                if(!targetId) return;
+                const topScore = await Score.findOne({ targetId: msg.data.id })
+                .sort({ score: -1, createdAt: 1 });
+                if(topScore)
+                {
+                    await publish('score.events', {
+                        type: 'score.winner',
+                        data:{
+                            topScore
+                        }
+                });
+                }
+            } catch (error) {
+                console.error("Error while setting winner:", error);
+            }  
+        }
+    });
+    await consume('submission.events', async (msg) => {
+        if (msg.type === 'submission.deleted') {
+            try {
+                await Score.deleteMany({ submissionId: msg.data.id });
+            } catch (error) {
+                console.error("Error saving submission deletion:", error);
             }
         }
     });

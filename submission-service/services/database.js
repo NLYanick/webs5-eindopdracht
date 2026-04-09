@@ -14,7 +14,7 @@ const submissionsSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    photoUrl: { 
+    imageName: { 
         type: String, 
         required: true
     }
@@ -24,6 +24,7 @@ mongoose.model('Submission', submissionsSchema);
 
 
 const targetsSchema = new mongoose.Schema({
+    organizerId: { type: String, required: true },
     status: {
         type: String,
         enum: ['OPEN', 'CLOSED'],
