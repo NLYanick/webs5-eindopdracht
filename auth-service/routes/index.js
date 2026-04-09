@@ -24,8 +24,10 @@ router.post('/login', async (req, res) => {
 router.post('/register', async (req, res) => {
     const { username, password } = req.body;
 
-    if(!username || !password) 
-        return res.status(401).json({ message: 'Invalid Credentials' });
+    if(!username || !password) return res.status(401).json({ message: 'Invalid Credentials' });
+
+    const existingUser = await User.findOne({ username });
+    if(existingUser) return res.status(400).json({ message: 'Username already exists. Please choose a different username.' });
 
     const user = await User.create({
         username: username,
