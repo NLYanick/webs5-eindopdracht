@@ -1,2 +1,0 @@
-Check of de user al is geregistreerd in de auth service
-Tests fixen
