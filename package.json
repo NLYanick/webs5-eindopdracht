@@ -15,12 +15,13 @@
   "type": "commonjs",
   "scripts": {
     "start": "concurrently \"node ./api-gateway/app.js\" \"node ./target-service/app.js\" \"node ./auth-service/app.js\" \"node ./submission-service/app.js\" \"node ./score-service/app.js\" \"node ./clock-service/app.js\" \"node ./register-service/app.js\" \"node ./reader-service/app.js\"",
-    "dev": "concurrently \"nodemon ./api-gateway/app.js\" \"nodemon ./target-service/app.js\" \"nodemon ./auth-service/app.js\" \"nodemon ./submission-service/app.js\" \"nodemon ./score-service/app.js\" \"nodemon ./clock-service/app.js\" \"nodemon ./register-service/app.js\" \"nodemon ./reader-service/app.js\"",
+    "dev": "concurrently \"nodemon ./api-gateway/app.js\" \"nodemon ./target-service/app.js\" \"nodemon ./auth-service/app.js\" \"nodemon ./submission-service/app.js\" \"nodemon ./score-service/app.js\" \"nodemon ./clock-service/app.js\" \"nodemon ./register-service/app.js\" \"nodemon ./reader-service/app.js\" \"nodemon ./mailer-service/app.js\"",
     "test": "jest --detectOpenHandles",
     "test:coverage": "jest --coverage",
     "test:verbose": "jest --verbose"
   },
   "dependencies": {
+    "@getbrevo/brevo": "^5.0.3",
     "amqplib": "^0.10.9",
     "bcrypt": "^6.0.0",
     "concurrently": "^9.2.1",
