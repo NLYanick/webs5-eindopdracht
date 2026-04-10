@@ -22,9 +22,10 @@ async function sendEmail(emails, subject, htmlContent) {
 
         await client.transactionalEmails.sendTransacEmail({
             subject: subject,
-            sender: { name: "Chat App", email: process.env.SENDER_EMAIL },
+            sender: { name: "WEBS5 Eindopdracht", email: process.env.SENDER_EMAIL },
             to,
-            htmlContent
+            htmlContent,
+            textContent: htmlContent.replace(/<[^>]+>/g, '') // Strip HTML tags for text content
         });
     } catch (error) {
         handleError(error);
@@ -35,11 +36,12 @@ async function sendGreetingEmail(email,username) {
     try {
         await sendEmail(email, "Welcome",
             ` <html> 
-                <body style="font-family: Arial, sans-serif; color: white; margin: 0; padding: 0;"> 
+                <body style="font-family: Arial, sans-serif; margin: 0; padding: 0;"> 
                 <div style="text-align: center; padding-top: 30px;">
                     <h1 padding: 15px 0;">Welcome</h1>
                     <div style="margin-top: 40px;">
-                    <p style="margin-bottom: 30px">Welcome here ${username}</p>
+                    <p style="margin-bottom: 30px">Welcome to WEBS5 Eindopdracht, ${username}! Great to have you on board.</p>
+                    <p style="margin-bottom: 30px">We hope you enjoy using our platform and find it useful for your needs.</p>
                     </div>
                 </div>
 
@@ -57,11 +59,11 @@ async function sendScoreEmail(email,username,score,targetId) {
     try {
         await sendEmail(email, "Score Calculated",
             ` <html> 
-                <body style="font-family: Arial, sans-serif; color: white; margin: 0; padding: 0;"> 
+                <body style="font-family: Arial, sans-serif; margin: 0; padding: 0;"> 
                 <div style="text-align: center; padding-top: 30px;">
                     <h1 padding: 15px 0;">Score calculated</h1>
                     <div style="margin-top: 40px;">
-                    <p style="margin-bottom: 30px">hello ${username}</p>
+                    <p style="margin-bottom: 30px">Hello ${username}</p>
                     <p style="margin-bottom: 30px">Your score on the target with id: ${targetId} has been calculated</p>
                     <p style="margin-bottom: 30px">Your score is ${score}</p>
                     </div>
@@ -81,7 +83,7 @@ async function sendReminderEmails(emails,targetId,timeLeft) {
     try {
         await sendEmail(emails, "Reminder",
             ` <html> 
-                <body style="font-family: Arial, sans-serif; color: white; margin: 0; padding: 0;"> 
+                <body style="font-family: Arial, sans-serif; margin: 0; padding: 0;"> 
                 <div style="text-align: center; padding-top: 30px;">
                     <h1 padding: 15px 0;">Reminder</h1>
                     <div style="margin-top: 40px;">
