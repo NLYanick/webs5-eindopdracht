@@ -16,8 +16,8 @@ async function startConsumers() {
             });
         }
         if (msg.type === 'target.deleted') {
-            await Target.findByIdAndDelete(msg.data.id);
-            await Submission.deleteMany({ targetId: msg.data.id });
+            await Target.findByIdAndDelete(msg.data._id);
+            await Submission.deleteMany({ targetId: msg.data._id });
         }
         if (msg.type === 'target.closed') {
             await Target.findByIdAndUpdate(msg.data.id, { status: 'CLOSED' });
@@ -32,6 +32,7 @@ async function startConsumers() {
             }, { upsert: true }); // Create a new vote if it doesn't exist
         }
         if(msg.type === 'target.votes.removed') {
+            console.log(msg.data)
             await Votes.deleteOne({_id: msg.data._id});
         }
     });
@@ -64,8 +65,16 @@ async function startConsumers() {
             if (msg.type === 'score.created') {
                 // Update the submission with its score when it comes in
                 await Submission.findOneAndUpdate(
-                    { photoUrl: msg.data.imageName },
+                    { photoUrl: msg.data.photoUrl },
                     { score: msg.data.score }
+                );
+                console.log('Score updated on submission in reader DB:', msg.data.imageName);
+            }
+            if (msg.type === 'score.winner') {
+
+                await Target.findOneAndUpdate(
+                    { _id: msg.data.targetId },
+                    { winner: msg.data.userUid }
                 );
                 console.log('Score updated on submission in reader DB:', msg.data.imageName);
             }

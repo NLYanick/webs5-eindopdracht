@@ -16,8 +16,8 @@ async function startConsumers() {
         }
         if (msg.type === 'target.deleted') {
             try {
-                await Target.deleteOne({ _id: msg.data.id });
-                await Submission.deleteMany({ targetId: msg.data.id });
+                await Target.deleteOne({ _id: msg.data._id });
+                await Submission.deleteMany({ targetId: msg.data._id });
             } catch (error) {
                 console.error("Error creating target ID:", error);
             }
@@ -45,7 +45,7 @@ async function startConsumers() {
         }
         if (msg.type === 'register.deleted') {
             try {
-                await Register.deleteOne({ _id: msg.data._id });
+                await Register.findOneAndDelete({ _id: msg.data._id });
             } catch (error) {
                 console.error("Error deleting register:", error);
             }

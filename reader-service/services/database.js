@@ -17,7 +17,8 @@ const targetSchema = new mongoose.Schema({
     city: { type: String, trim: true },
     lat: { type: Number },
     lng: { type: Number },
-    radiusInMeter: { type: Number, default: 500 }
+    radiusInMeter: { type: Number, default: 500 },
+    winner: {type: String, required: false, default: null }
 }, { timestamps: true });
 
 mongoose.model('Target', targetSchema);
