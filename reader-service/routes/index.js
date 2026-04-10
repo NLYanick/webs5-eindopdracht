@@ -16,7 +16,6 @@ const { fetchTargetId, isRegistered } = require('../services/middleware.js');
 router.get('/targets', passport.authenticate('jwt', { session: false }), async function (req, res, next) {
     try {
         const { city, lat, lng } = req.query;
-
         let filter = {};
 
         if (city) {

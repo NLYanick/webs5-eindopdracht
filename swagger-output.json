@@ -1,136 +1,443 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.0.0",
   "info": {
-    "title": "Target Service",
-    "description": "Target Service API documentation",
-    "version": "1.0.0"
+    "title": "Webs5 API",
+    "version": "1.0.0",
+    "description": "API Gateway for the Webs5 microservices project"
   },
-  "host": "localhost:3000",
-  "basePath": "/",
-  "schemes": ["http"],
-  "securityDefinitions": {
-    "bearerAuth": {
-      "type": "apiKey",
-      "in": "header",
-      "name": "Authorization"
+  "servers": [
+    {
+      "url": "http://localhost:3000/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Opaque token returned from login/register"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" }
+        }
+      },
+      "Target": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "title": { "type": "string" },
+          "organizerId": { "type": "string" },
+          "status": { "type": "string", "enum": ["OPEN", "CLOSED"] },
+          "photoUrl": { "type": "string" },
+          "endDate": { "type": "string", "format": "date-time" },
+          "city": { "type": "string" },
+          "lat": { "type": "number" },
+          "lng": { "type": "number" },
+          "radiusInMeter": { "type": "number" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Submission": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "targetId": { "type": "string" },
+          "userUid": { "type": "string" },
+          "photoUrl": { "type": "string" },
+          "score": { "type": "number", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Score": {
+        "type": "object",
+        "properties": {
+          "score": { "type": "number" },
+          "userUid": { "type": "string" }
+        }
+      }
     }
   },
+  "security": [
+    { "bearerAuth": [] }
+  ],
   "paths": {
-    "/api/v1/": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": { "description": "OK" }
-        }
-      }
-    },
-    "/api/v1/auth/login": {
+    "/auth/login": {
       "post": {
-        "description": "Login with username and password",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "properties": {
-                "username": { "type": "string" },
-                "password": { "type": "string" }
-              },
-              "required": ["username", "password"]
+        "tags": ["Auth"],
+        "summary": "Login",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "200": { "description": "Login successful, returns JWT token" },
-          "400": { "description": "Bad Request" },
-          "401": { "description": "Invalid credentials" },
-          "500": { "description": "Internal Server Error" }
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": { "type": "string", "description": "Opaque token to use in Authorization header" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Invalid credentials", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
         }
       }
     },
-    "/api/v1/auth/register": {
+    "/auth/register": {
       "post": {
-        "description": "Register a new user",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "properties": {
-                "username": { "type": "string" },
-                "password": { "type": "string" }
-              },
-              "required": ["username", "password"]
+        "tags": ["Auth"],
+        "summary": "Register",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": { "type": "string", "required" :true },
+                  "password": { "type": "string", "required" :true },
+                  "email": { "type": "string", "required" :true }
+                }
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "201": { "description": "User created" },
-          "400": { "description": "Bad Request" },
-          "500": { "description": "Internal Server Error" }
+          "200": {
+            "description": "Registration successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Invalid credentials", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
         }
       }
     },
-    "/api/v1/targets/": {
+    "/targets": {
       "get": {
-        "description": "Get targets filtered by city or coordinates",
+        "tags": ["Targets"],
+        "summary": "Get all targets",
         "parameters": [
-          { "name": "city", "in": "query", "type": "string", "description": "City name to filter targets" },
-          { "name": "lat", "in": "query", "type": "number", "description": "Latitude coordinate" },
-          { "name": "lng", "in": "query", "type": "number", "description": "Longitude coordinate" }
+          { "in": "query", "name": "city", "schema": { "type": "string" }, "description": "Filter by city name" },
+          { "in": "query", "name": "lat", "schema": { "type": "number" }, "description": "Latitude for proximity filter" },
+          { "in": "query", "name": "lng", "schema": { "type": "number" }, "description": "Longitude for proximity filter" }
         ],
         "responses": {
-          "200": { "description": "Targets found" },
-          "400": { "description": "No valid query params provided" },
-          "401": { "description": "Unauthorized" },
-          "404": { "description": "No targets found" },
-          "500": { "description": "Internal Server Error" }
+          "200": {
+            "description": "List of targets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Target" }
+                }
+              }
+            }
+          },
+          "404": { "description": "No targets found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
         }
       },
       "post": {
-        "description": "Create a new target",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "properties": {
-                "title": { "type": "string" },
-                "organizerId": { "type": "string" },
-                "photoUrl": { "type": "string" },
-                "city": { "type": "string" },
-                "lat": { "type": "number" },
-                "lng": { "type": "number" },
-                "radiusInMeter": { "type": "number" }
-              },
-              "required": ["title", "organizerId"]
+        "tags": ["Targets"],
+        "summary": "Create a target",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["target-photo", "title", "organizerId"],
+                "properties": {
+                  "target-photo": { "type": "string", "format": "binary" },
+                  "title": { "type": "string" },
+                  "city": { "type": "string" },
+                  "lat": { "type": "number" },
+                  "lng": { "type": "number" },
+                  "radiusInMeter": { "type": "number" },
+                  "endDate": { "type": "string", "format": "date-time" }
+                }
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "201": { "description": "Target created" },
-          "400": { "description": "Validation error" },
-          "401": { "description": "Unauthorized" },
-          "500": { "description": "Internal Server Error" }
+          "201": {
+            "description": "Target created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Target" }
+              }
+            }
+          },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
         }
       }
     },
-    "/api/v1/targets/{id}": {
+    "/targets/{id}": {
       "delete": {
-        "description": "Delete a target by ID",
+        "tags": ["Targets"],
+        "summary": "Delete a target",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "type": "string", "description": "Target ID" },
-          { "name": "authorization", "in": "header", "type": "string", "required": true }
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
           "200": { "description": "Target deleted" },
-          "400": { "description": "Invalid target ID" },
-          "401": { "description": "Unauthorized" },
-          "404": { "description": "Target not found" },
-          "500": { "description": "Internal Server Error" }
+          "404": { "description": "Target not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/targets/{id}/votes": {
+      "get": {
+        "tags": ["Targets"],
+        "summary": "Get votes for a target",
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Votes retrieved" }
+        }
+      }
+    },
+    "/targets/{id}/vote": {
+      "post": {
+        "tags": ["Targets"],
+        "summary": "Vote on a target",
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vote": { "type": "string", "description": "Vote value", "enum": ["thumbsUp", "thumbsDown"] }
+                  
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Vote registered" }
+        }
+      },
+      "delete": {
+        "tags": ["Targets"],
+        "summary": "Remove vote from a target",
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Vote removed" }
+        }
+      }
+    },
+    "/targets/{targetId}/registers": {
+      "post": {
+        "tags": ["Registers"],
+        "summary": "Register for a target",
+        "parameters": [
+          { "in": "path", "name": "targetId", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "201": { "description": "Registered successfully" },
+          "400": { "description": "Target ID is required", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Registers"],
+        "summary": "Unregister from a target",
+        "parameters": [
+          { "in": "path", "name": "targetId", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Unregistered successfully" },
+          "400": { "description": "Target ID is required", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/targets/{targetId}/submissions": {
+      "get": {
+        "tags": ["Submissions"],
+        "summary": "Get all submissions for a target",
+        "parameters": [
+          { "in": "path", "name": "targetId", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of submissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "submissions": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Submission" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Submissions"],
+        "summary": "Upload a submission",
+        "parameters": [
+          { "in": "path", "name": "targetId", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["photo"],
+                "properties": {
+                  "photo": { "type": "string", "format": "binary" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Submission uploaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "image_name": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "File is required", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/targets/{targetId}/submissions/my": {
+      "get": {
+        "tags": ["Submissions"],
+        "summary": "Get current user's submissions for a target",
+        "parameters": [
+          { "in": "path", "name": "targetId", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "User's submissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "submissions": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Submission" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/targets/{targetId}/submissions/{filename}": {
+      "get": {
+        "tags": ["Submissions"],
+        "summary": "Get a single submission by filename",
+        "parameters": [
+          { "in": "path", "name": "targetId", "required": true, "schema": { "type": "string" } },
+          { "in": "path", "name": "filename", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Submission found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Submission" }
+              }
+            }
+          },
+          "404": { "description": "Submission not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Submissions"],
+        "summary": "Delete a submission",
+        "parameters": [
+          { "in": "path", "name": "targetId", "required": true, "schema": { "type": "string" } },
+          { "in": "path", "name": "filename", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "204": { "description": "Submission deleted" },
+          "404": { "description": "Submission not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/scores/{targetId}": {
+      "get": {
+        "tags": ["Scores"],
+        "summary": "Get scores for a target",
+        "parameters": [
+          { "in": "path", "name": "targetId", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Scores retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "scores": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Score" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "No scores found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
         }
       }
     }

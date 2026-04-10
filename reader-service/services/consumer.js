@@ -69,6 +69,14 @@ async function startConsumers() {
                 );
                 console.log('Score updated on submission in reader DB:', msg.data.imageName);
             }
+            if (msg.type === 'score.winner') {
+                // Update the submission with its score when it comes in
+                await Target.findOneAndUpdate(
+                    { _id: msg.data.targetId },
+                    { winner: msg.data.userUid }
+                );
+                console.log('Score updated on submission in reader DB:', msg.data.imageName);
+            }
         } catch (error) {
             console.error(`Error handling score event (${msg.type}):`, error);
         }

@@ -10,7 +10,8 @@ const readerService = process.env.READER_SERVICE;
 
 router.get('/', async (req, res) => {
     try {
-        const { json, status } = await circuitBreaker.fire("get", readerService, "reader/targets", null, { authorization: req.headers.authorization });
+        const query = new URLSearchParams(req.query).toString();
+        const { json, status } = await circuitBreaker.fire("get", readerService, `reader/targets?${query}`, null, { authorization: req.headers.authorization });
 
         res.status(status).json(json);
     } catch (error) {

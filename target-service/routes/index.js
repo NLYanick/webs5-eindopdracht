@@ -46,6 +46,9 @@ router.post('/', uploads.single('target-photo'), passport.authenticate('jwt', { 
             title: saved.title,
             organizerId: saved.organizerId,
             photoUrl: saved.photoUrl,
+            city: saved.city,
+            lat: saved.lat,
+            lng: saved.lng,
             endDate: saved.endDate,
             status: saved.status,
         }
@@ -79,7 +82,7 @@ router.delete('/:id', passport.authenticate('jwt', { session: false }), fetchTar
             if (err) console.error('Error deleting file:', err);
         });
 
-        await publish("target.events", { type: "target.deleted", data: target });
+        await publish("target.events", { type: "target.deleted", data: target, id: target._id });
 
         res.status(200).json({ message: 'Target deleted', target });
     } catch (err) {
