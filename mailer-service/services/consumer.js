@@ -34,7 +34,7 @@ async function startConsumers() {
             }
         }
         if(msg.type === 'target.created'){
-            await Target.create({_id: msg.data._id, endDate: endDate})
+            await Target.create({_id: msg.data.id, endDate: msg.data.endDate})
         }
         if(msg.type === 'target.deleted'){
             await Target.deleteOne({_id: msg.data._id})
@@ -49,7 +49,7 @@ async function startConsumers() {
 
                 const user = await User.findOne({ uid: userUid });
                 if (!user) return console.error('User not found for uid:', userUid);
-
+                console.log("score")
                 await sendScoreEmail(
                     user.email,
                     user.username,
@@ -79,7 +79,7 @@ async function startConsumers() {
     await consume('register.events', async (msg) => {
         if (msg.type === 'register.created') {
             try {
-                await register.create( msg.data );
+                await Register.create( msg.data );
             } catch (error) {
                 console.error('Error sending registration mail:', error);
             }
