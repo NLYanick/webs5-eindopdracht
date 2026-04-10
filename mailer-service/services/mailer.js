@@ -5,9 +5,6 @@ const client = new BrevoClient({
     timeoutInSeconds: 30
 });
 
-const primaryColor = '#242424';
-const secondaryColor = '#8e51ff';
-
 function handleError(error) {
   if (error instanceof BrevoError) {
     console.error(`API error ${error.statusCode}:`, error.message);

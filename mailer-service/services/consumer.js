@@ -1,7 +1,6 @@
 const { consume } = require("../../pubsub");
-const { create } = require("../../target-service/services/database.js");
 const { sendGreetingEmail, sendScoreEmail } = require("./mailer");
-require("./database.js");
+
 const mongoose = require("mongoose");
 
 const User = mongoose.model("User");
