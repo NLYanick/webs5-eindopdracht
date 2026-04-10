@@ -16,3 +16,10 @@ const targetSchema = new mongoose.Schema({
 });
 
 mongoose.model('Target', targetSchema);
+
+const registerSchema = new mongoose.Schema({
+    targetId: { type: mongoose.Schema.Types.ObjectId, required: true },
+    userUid: { type: String, required: true, ref: 'User' },
+    hasSubmitted: { type: Boolean, default: false }
+});
+mongoose.model('Register', registerSchema);

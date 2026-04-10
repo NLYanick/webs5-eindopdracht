@@ -1,10 +1,11 @@
 const { consume } = require("../../pubsub");
-const { sendGreetingEmail, sendScoreEmail } = require("./mailer");
+const { sendGreetingEmail, sendScoreEmail, sendReminderEmails } = require("./mailer");
 
 const mongoose = require("mongoose");
 
 const User = mongoose.model("User");
 const Target = mongoose.model("Target");
+const Register = mongoose.model("Register");
 
 async function startConsumers() {
     await consume('target.events', async (msg) => {
@@ -13,8 +14,15 @@ async function startConsumers() {
             try {
                 const { targetId } = msg.data;
 
-                const target = await Target.findOne({ uid: userUid });
-                if (!user) return console.error('target not found for targetId:', targetId);
+                const target = await Target.findOne({ _id: targetId});
+                const timeLeft = getTimeLeft(target.endDate)
+
+                const registrations = await Register.find({ targetId: targetId, hasSubmitted: false });
+                if (!registrations || registrations.length == 0) return console.error('target not found for targetId:', targetId);
+
+                const uids = registrations.map(r => r.userUid);
+                const users = await User.find({ uid: { $in: uids } });
+                const emails = users.map(u => u.email);
 
                 await sendReminderEmails(
                     emails,
@@ -26,7 +34,11 @@ async function startConsumers() {
             }
         }
         if(msg.type === 'target.created'){
-            Target.create({_id: msg.data._id, endDate: endDate})
+            await Target.create({_id: msg.data._id, endDate: endDate})
+        }
+        if(msg.type === 'target.deleted'){
+            await Target.deleteOne({_id: msg.data._id})
+            await Register.deleteMany({targetId: msg.data._id})
         }
     });
 
@@ -63,6 +75,48 @@ async function startConsumers() {
             }
         }
     });
+
+    await consume('register.events', async (msg) => {
+        if (msg.type === 'register.created') {
+            try {
+                await register.create( msg.data );
+            } catch (error) {
+                console.error('Error sending registration mail:', error);
+            }
+        }
+    });
+
+    await consume('submission.events', async (msg) => {
+        if (msg.type === 'submission.created') {
+            try {
+                const {targetId, userUid} = msg.data
+                await Register.findOneAndUpdate(
+                    { targetId, userUid },
+                    { submissionSend: true }
+                );
+                console.log("submit");
+            } catch (error) {
+                console.error('Error sending registration mail:', error);
+            }
+        }
+    });
+}
+
+function getTimeLeft(endDate) {
+    const diff = new Date(endDate) - new Date();
+    if (diff <= 0) return 'Target has closed';
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (hours > 24) {
+        const days = Math.floor(hours / 24);
+        return `${days} day${days > 1 ? 's' : ''} left`;
+    }
+
+    if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} and ${minutes} minute${minutes > 1 ? 's' : ''} left`;
+
+    return `${minutes} minute${minutes > 1 ? 's' : ''} left`;
 }
 
 module.exports = startConsumers;

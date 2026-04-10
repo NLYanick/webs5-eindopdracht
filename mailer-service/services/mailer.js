@@ -6,22 +6,22 @@ const client = new BrevoClient({
 });
 
 function handleError(error) {
-  if (error instanceof BrevoError) {
-    console.error(`API error ${error.statusCode}:`, error.message);
-  } else {
-    console.error('Unexpected error:', error);
-  }
-  throw error;
+    if (error instanceof BrevoError) {
+        console.error(`API error ${error.statusCode}:`, error.message);
+    } else {
+        console.error('Unexpected error:', error);
+    }
+    throw error;
 }
 
-async function sendEmail(emails, htmlContent) {
+async function sendEmail(emails, subject, htmlContent) {
     try {
         const to = Array.isArray(emails)
             ? emails.map(email => ({ email }))
             : [{ email: emails }];
 
         await client.transactionalEmails.sendTransacEmail({
-            subject: "Reset Your Password",
+            subject: subject,
             sender: { name: "Chat App", email: process.env.SENDER_EMAIL },
             to,
             htmlContent
@@ -33,7 +33,7 @@ async function sendEmail(emails, htmlContent) {
 
 async function sendGreetingEmail(email,username) {
     try {
-        await sendEmail(email,
+        await sendEmail(email, "Welcome",
             ` <html> 
                 <body style="font-family: Arial, sans-serif; color: white; margin: 0; padding: 0;"> 
                 <div style="text-align: center; padding-top: 30px;">
@@ -55,7 +55,7 @@ async function sendGreetingEmail(email,username) {
 
 async function sendScoreEmail(email,username,score,targetId) {
     try {
-        await sendEmail(email,
+        await sendEmail(email, "Score Calculated",
             ` <html> 
                 <body style="font-family: Arial, sans-serif; color: white; margin: 0; padding: 0;"> 
                 <div style="text-align: center; padding-top: 30px;">
@@ -79,7 +79,7 @@ async function sendScoreEmail(email,username,score,targetId) {
 
 async function sendReminderEmails(emails,targetId,timeLeft) {
     try {
-        await sendEmail(emails,
+        await sendEmail(emails, "Reminder",
             ` <html> 
                 <body style="font-family: Arial, sans-serif; color: white; margin: 0; padding: 0;"> 
                 <div style="text-align: center; padding-top: 30px;">
@@ -100,4 +100,4 @@ async function sendReminderEmails(emails,targetId,timeLeft) {
     } 
 }
 
-module.exports = {sendGreetingEmail, sendScoreEmail}
+module.exports = {sendGreetingEmail, sendScoreEmail, sendReminderEmails}
