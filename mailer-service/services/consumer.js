@@ -9,7 +9,6 @@ const Register = mongoose.model("Register");
 
 async function startConsumers() {
     await consume('target.events', async (msg) => {
-        console.log(msg)
         if (msg.type === 'target.reminder') {
             try {
                 const { targetId } = msg.data;
@@ -49,7 +48,6 @@ async function startConsumers() {
 
                 const user = await User.findOne({ uid: userUid });
                 if (!user) return console.error('User not found for uid:', userUid);
-                console.log("score")
                 await sendScoreEmail(
                     user.email,
                     user.username,
@@ -90,7 +88,7 @@ async function startConsumers() {
         if (msg.type === 'submission.created') {
             try {
                 const {targetId, userUid} = msg.data
-                console.log(targetId);
+
                 await Register.findOneAndUpdate(
                     { targetId: targetId, userUid: userUid },
                     { hasSubmitted: true }
