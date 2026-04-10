@@ -107,9 +107,7 @@ async function startConsumers() {
                 {
                     await publish('score.events', {
                         type: 'score.winner',
-                        data:{
-                            topScore
-                        }
+                        data: topScore,
                 });
                 }
             } catch (error) {
