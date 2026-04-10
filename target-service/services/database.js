@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+console.log("DbTarget")
 const url = `${process.env.DB_URL}/${process.env.DB_NAME_TARGET}` || 'mongodb://localhost:27017/mydb';
 mongoose.connect(url);
 
