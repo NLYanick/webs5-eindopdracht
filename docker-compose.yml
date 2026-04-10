@@ -1,0 +1,175 @@
+services:
+  # Message Bus
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - app-network
+
+  # Services    
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    networks:
+      - app-network
+    depends_on:
+      - auth-service
+      - target-service
+      - submission-service
+      - score-service
+      - clock-service
+      - reader-service
+      - register-service
+      - mailer-service
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: auth-service/Dockerfile
+    container_name: webs5-auth-service
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  target-service:
+    build:
+      context: .
+      dockerfile: target-service/Dockerfile
+    container_name: webs5-target-service
+    ports:
+      - "3002:3002"
+    env_file:
+      - .env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  submission-service:
+    build:
+      context: .
+      dockerfile: submission-service/Dockerfile
+    container_name: webs5-submission-service
+    ports:
+      - "3003:3003"
+    env_file:
+      - .env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  score-service:
+    build:
+      context: .
+      dockerfile: score-service/Dockerfile
+    container_name: webs5-score-service
+    ports:
+      - "3004:3004"
+    env_file:
+      - .env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  clock-service:
+    build:
+      context: .
+      dockerfile: clock-service/Dockerfile
+    container_name: webs5-clock-service
+    ports:
+      - "3005:3005"
+    env_file:
+      - .env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  reader-service:
+    build:
+      context: .
+      dockerfile: reader-service/Dockerfile
+    container_name: webs5-reader-service
+    ports:
+      - "3006:3006"
+    env_file:
+      - .env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  register-service:
+    build:
+      context: .
+      dockerfile: register-service/Dockerfile
+    container_name: webs5-register-service
+    ports:
+      - "3007:3007"
+    env_file:
+      - .env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - app-network
+  
+  mailer-service:
+    build:
+      context: .
+      dockerfile: mailer-service/Dockerfile
+    container_name: webs5-mailer-service
+    ports:
+      - "3008:3008"
+    env_file:
+      - .env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - app-network
+  
+  # Database Server (8 databases inside)
+  mongodb:
+    image: mongo:latest
+    container_name: webs5-mongodb-server
+    ports:
+      - "28000:27017"
+    volumes:
+      - ./data/mongodb:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=webs5
+      - MONGO_INITDB_ROOT_PASSWORD=webs5_password
+    restart: always
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+networks:
+  app-network:
+    driver: bridge

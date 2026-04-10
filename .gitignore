@@ -141,3 +141,4 @@ vite.config.ts.timestamp-*
 
 
 /public/uploads/*
+data/mongodb/*

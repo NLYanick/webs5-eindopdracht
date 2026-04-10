@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 console.log("DbMailer")
-const url = `${process.env.DB_URL}/${process.env.DB_NAME_MAILER}` || 'mongodb://localhost:27017/mydb';
+const url = `${process.env.DB_URL}/${process.env.DB_NAME_MAILER}?authSource=admin` || 'mongodb://localhost:27017/mydb';
 mongoose.connect(url);
 
 const userSchema = new mongoose.Schema({
