@@ -14,20 +14,20 @@ async function startConsumers() {
         if (msg.type === 'submission.created') {
             try {
                 const submission = msg.data;
-                const imageName = submission.imageName;
+                const photoUrl = submission.photoUrl;
 
                 const uploadsDir = path.join(__dirname, '../../public/uploads');
                 const target = await Target.findOne({ _id: submission.targetId });
                 if(!target) return;
 
                 const targetBuffer = fs.readFileSync(path.join(uploadsDir, target.photoUrl));
-                const submissionBuffer = fs.readFileSync(path.join(uploadsDir, imageName));
+                const submissionBuffer = fs.readFileSync(path.join(uploadsDir, photoUrl));
 
                 const targetFormData = new FormData();
                 targetFormData.append('image', new Blob([targetBuffer]), { filename: target.photoUrl });
 
                 const submissionFormData = new FormData();
-                submissionFormData.append('image', new Blob([submissionBuffer]), { filename: imageName });
+                submissionFormData.append('image', new Blob([submissionBuffer]), { filename: photoUrl });
 
                 const [submissionResult, targetResult] = await Promise.all([
                     circuitBreaker.fire(
@@ -69,7 +69,7 @@ async function startConsumers() {
                     await publish('score.events', {
                         type: 'score.created',
                         data:{
-                        imageName,
+                        photoUrl,
                         userUid: submission.userUid,
                         score,
                         targetId: submission.targetId
