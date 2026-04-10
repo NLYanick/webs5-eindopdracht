@@ -176,7 +176,7 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": ["target-photo", "title", "organizerId"],
+                "required": ["target-photo", "title"],
                 "properties": {
                   "target-photo": { "type": "string", "format": "binary" },
                   "title": { "type": "string" },

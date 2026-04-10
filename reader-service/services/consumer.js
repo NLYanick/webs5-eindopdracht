@@ -16,7 +16,7 @@ async function startConsumers() {
             });
         }
         if (msg.type === 'target.deleted') {
-            await Target.findByIdAndDelete(msg.data.id);
+            await Target.findByIdAndDelete(msg.data._id);
             await Submission.deleteMany({ targetId: msg.data.id });
         }
         if (msg.type === 'target.closed') {

@@ -82,7 +82,7 @@ router.delete('/:id', passport.authenticate('jwt', { session: false }), fetchTar
             if (err) console.error('Error deleting file:', err);
         });
 
-        await publish("target.events", { type: "target.deleted", data: target, id: target._id });
+        await publish("target.events", { type: "target.deleted", data: target });
 
         res.status(200).json({ message: 'Target deleted', target });
     } catch (err) {
