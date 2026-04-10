@@ -1,0 +1,159 @@
+services:
+  # Message Bus
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - app-network
+
+  # Services    
+  api-gateway:
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    networks:
+      - app-network
+    depends_on:
+      - auth-service
+      - target-service
+      - submission-service
+      - score-service
+      - clock-service
+      - reader-service
+      - register-service
+      - mail-service
+
+  auth-service:
+    container_name: auth-service
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    environment:
+      - DB_URL=mongodb://webs5:webs5_password@mongodb:27017
+      - DB_NAME_AUTH=webs5-auth
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  target-service:
+    container_name: target-service
+    ports:
+      - "3002:3002"
+    env_file:
+      - .env
+    environment:
+      - DB_URL=mongodb://webs5:webs5_password@mongodb:27017
+      - DB_NAME_TARGET=webs5-target
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  submission-service:
+    container_name: submission-service
+    ports:
+      - "3003:3003"
+    env_file:
+      - .env
+    environment:
+      - DB_URL=mongodb://webs5:webs5_password@mongodb:27017
+      - DB_NAME_SUBMISSION=webs5-submission
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  score-service:
+    container_name: score-service
+    ports:
+      - "3004:3004"
+    env_file:
+      - .env
+    environment:
+      - DB_URL=mongodb://webs5:webs5_password@mongodb:27017
+      - DB_NAME_SCORE=webs5-score
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  clock-service:
+    container_name: clock-service
+    ports:
+      - "3005:3005"
+    env_file:
+      - .env
+    environment:
+      - DB_URL=mongodb://webs5:webs5_password@mongodb:27017
+      - DB_NAME_CLOCK=webs5-clock
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  reader-service:
+    container_name: reader-service
+    ports:
+      - "3006:3006"
+    env_file:
+      - .env
+    environment:
+      - DB_URL=mongodb://webs5:webs5_password@mongodb:27017
+      - DB_NAME_READER=webs5-reader
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  register-service:
+    container_name: register-service
+    ports:
+      - "3007:3007"
+    env_file:
+      - .env
+    environment:
+      - DB_URL=mongodb://webs5:webs5_password@mongodb:27017
+      - DB_NAME_REGISTER=webs5-register
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+  
+  mail-service:
+    container_name: mail-service
+    ports:
+      - "3008:3008"
+    env_file:
+      - .env
+    environment:
+      - DB_URL=mongodb://webs5:webs5_password@mongodb:27017
+      - DB_NAME_MAIL=webs5-mailer
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+  
+  # Database Server (8 databases inside)
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/mongodb:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=webs5
+      - MONGO_INITDB_ROOT_PASSWORD=webs5_password
+    networks:
+      - app-network
+    restart: always
+
+networks:
+  app-network:
+    driver: bridge
