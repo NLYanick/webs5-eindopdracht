@@ -90,11 +90,11 @@ async function startConsumers() {
         if (msg.type === 'submission.created') {
             try {
                 const {targetId, userUid} = msg.data
+                console.log(targetId);
                 await Register.findOneAndUpdate(
-                    { targetId, userUid },
-                    { submissionSend: true }
+                    { targetId: targetId, userUid: userUid },
+                    { hasSubmitted: true }
                 );
-                console.log("submit");
             } catch (error) {
                 console.error('Error sending registration mail:', error);
             }
@@ -104,7 +104,6 @@ async function startConsumers() {
 
 function getTimeLeft(endDate) {
     const diff = new Date(endDate) - new Date();
-    if (diff <= 0) return 'Target has closed';
 
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
