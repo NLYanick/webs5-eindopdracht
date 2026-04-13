@@ -18,6 +18,8 @@ services:
       - "3000:3000"
     env_file:
       - .env
+    volumes:
+      - uploads:/app/public/uploads
     networks:
       - app-network
     depends_on:
@@ -57,6 +59,8 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
+    volumes:
+      - uploads:/app/public/uploads
     networks:
       - app-network
 
@@ -72,6 +76,8 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
+    volumes:
+      - uploads:/app/public/uploads
     networks:
       - app-network
 
@@ -87,6 +93,8 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
+    volumes:
+      - uploads:/app/public/uploads
     networks:
       - app-network
 
@@ -169,6 +177,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+
+volumes:
+  uploads:
 
 networks:
   app-network:

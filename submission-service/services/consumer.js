@@ -5,6 +5,9 @@ const Target = mongoose.model("Target");
 const Submission = mongoose.model("Submission");
 const Register = mongoose.model("Register");
 
+const fs = require('fs');
+const path = require('path');
+
 async function startConsumers() {
     await consume('target.events', async (msg) => {
         if (msg.type === 'target.created') {
@@ -18,6 +21,11 @@ async function startConsumers() {
             try {
                 await Target.deleteOne({ _id: msg.data._id });
                 await Submission.deleteMany({ targetId: msg.data._id });
+
+                const filePath = path.join(__dirname, '../../public/uploads', msg.data.photoUrl);
+                fs.unlink(filePath, (err) => {
+                    if (err) console.error('Error deleting file:', err);
+                });
             } catch (error) {
                 console.error("Error creating target ID:", error);
             }

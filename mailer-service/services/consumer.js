@@ -82,6 +82,13 @@ async function startConsumers() {
                 console.error('Error sending registration mail:', error);
             }
         }
+        if (msg.type === 'register.deleted') {
+            try {
+                await Register.deleteOne({ _id: msg.data._id });
+            } catch (error) {
+                console.error('Error sending registration mail:', error);
+            }
+        }
     });
 
     await consume('submission.events', async (msg) => {

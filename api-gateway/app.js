@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const path = require('path');
 
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
@@ -21,7 +22,7 @@ const router = express.Router({ mergeParams: true });
 
 router.use('/', indexRouter);
 router.use('/auth', authRouter);
-router.use('/uploads', express.static('public/uploads'));
+router.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 router.use(checkOpaqueAndReplaceWithJWT);
 router.use('/targets', targetsRouter);
 router.use('/targets/:targetId/registers', registersRouter);

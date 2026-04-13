@@ -77,7 +77,7 @@ router.delete('/:id', passport.authenticate('jwt', { session: false }), fetchTar
             return res.status(404).json({ message: 'Target not found' });
         }
 
-        const filePath = path.join('public/uploads', target.photoUrl);
+        const filePath = path.join(__dirname, '../../public/uploads', target.photoUrl);
         fs.unlink(filePath, (err) => {
             if (err) console.error('Error deleting file:', err);
         });
