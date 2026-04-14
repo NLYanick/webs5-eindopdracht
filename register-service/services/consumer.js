@@ -4,7 +4,7 @@ const mongoose = require("mongoose")
 const Register = mongoose.model('Register');
 
 async function startConsumers() {
-    await consume('target.events', async (msg) => {
+    await consume('target.events', "register.target", async (msg) => {
         if (msg.type === 'target.deleted') {
             const registers = await Register.find({ targetId: msg.data.id });
             await Register.deleteMany({ targetId: msg.data.id });

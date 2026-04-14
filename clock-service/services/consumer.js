@@ -4,7 +4,7 @@ const {scheduleTimer,cancelTimer} = require("./timerEngine");
 
 
 async function startConsumers() {
-    await consume('target.events', async (msg) => {
+    await consume('target.events', "clock.target", async (msg) => {
         if (msg.type === 'target.created') {
             const { id, endDate } = msg.data || {};
 

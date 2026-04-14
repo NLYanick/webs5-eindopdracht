@@ -8,7 +8,7 @@ const Register = mongoose.model("Register");
 const Votes = mongoose.model("Votes");
 
 async function startConsumers() {
-    await consume('target.events', async (msg) => {
+    await consume('target.events', "reader.target", async (msg) => {
         if (msg.type === 'target.created') {
             await Target.create({
             _id: msg.data.id,
@@ -35,7 +35,7 @@ async function startConsumers() {
             await Votes.deleteOne({_id: msg.data._id});
         }
     });
-    await consume('submission.events', async (msg) => {
+    await consume('submission.events', "reader.submission", async (msg) => {
         if (msg.type === 'submission.created') {
             try {
                 const submission = msg.data;
@@ -59,7 +59,7 @@ async function startConsumers() {
         }
     });
 
-    await consume('score.events', async (msg) => {
+    await consume('score.events', "reader.score", async (msg) => {
         try {
             if (msg.type === 'score.created') {
                 // Update the submission with its score when it comes in
@@ -74,7 +74,7 @@ async function startConsumers() {
         }
     });
 
-    await consume('register.events', async (msg) => {
+    await consume('register.events', "reader.register", async (msg) => {
         if (msg.type === 'register.created') {
             try {
                 await Register.create({ _id: msg.data._id, targetId: msg.data.targetId, userUid: msg.data.userUid });
