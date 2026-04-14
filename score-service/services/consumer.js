@@ -91,8 +91,8 @@ async function startConsumers() {
         }
         if (msg.type === 'target.deleted') {
             try {
-                await Target.deleteOne({ _id: msg.data.id });
-                await Score.deleteMany({ targetId: msg.data.id });
+                await Target.deleteOne({ _id: msg.data._id });
+                await Score.deleteMany({ targetId: msg.data._id });
             } catch (error) {
                 console.error("Error saving target deletion:", error);
             }
@@ -107,9 +107,7 @@ async function startConsumers() {
                 {
                     await publish('score.events', {
                         type: 'score.winner',
-                        data:{
-                            topScore
-                        }
+                        data: topScore,
                 });
                 }
             } catch (error) {

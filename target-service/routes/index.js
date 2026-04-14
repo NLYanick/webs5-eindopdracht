@@ -46,6 +46,9 @@ router.post('/', uploads.single('target-photo'), passport.authenticate('jwt', { 
             title: saved.title,
             organizerId: saved.organizerId,
             photoUrl: saved.photoUrl,
+            city: saved.city,
+            lat: saved.lat,
+            lng: saved.lng,
             endDate: saved.endDate,
             status: saved.status,
         }
@@ -74,12 +77,24 @@ router.delete('/:id', passport.authenticate('jwt', { session: false }), fetchTar
             return res.status(404).json({ message: 'Target not found' });
         }
 
-        const filePath = path.join('public/uploads', target.photoUrl);
+        const filePath = path.join(__dirname, '../../public/uploads', target.photoUrl);
         fs.unlink(filePath, (err) => {
             if (err) console.error('Error deleting file:', err);
         });
 
         await publish("target.events", { type: "target.deleted", data: target });
+
+        const votes = await Votes.find({targetId: target._id})
+        await Votes.deleteMany({ targetId: target._id });
+        console.log(votes)
+        for (const vote of votes) {
+            await publish('target.events', {
+                type: 'target.votes.removed',
+                data: {
+                    _id: vote._id.toString()
+                }
+            });
+        }
 
         res.status(200).json({ message: 'Target deleted', target });
     } catch (err) {

@@ -46,7 +46,7 @@ router.delete('/:filename', passport.authenticate('jwt', { session: false }), is
 
     if (!photoName) return res.status(400).json({ message: 'Photo name is required' });
 
-    const existingSubmission = await Submission.findOne({ imageName: photoName });
+    const existingSubmission = await Submission.findOne({ photoUrl: photoName });
     if (!existingSubmission) return res.status(404).json({ message: 'Submission not found' });
 
     if(existingSubmission.userUid != req.user.sub){
@@ -59,7 +59,7 @@ router.delete('/:filename', passport.authenticate('jwt', { session: false }), is
 
     const submission = await Submission.deleteMany({_id: existingSubmission._id});
 
-    const filePath = path.join('public/uploads', photoName);
+    const filePath = path.join(__dirname, '../../public/uploads', photoName);
     fs.unlink(filePath, (err) => {
       if (err) console.error('Error deleting file:', err);
     });
