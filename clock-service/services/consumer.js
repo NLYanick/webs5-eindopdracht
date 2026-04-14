@@ -12,7 +12,7 @@ async function startConsumers() {
                 console.warn("Invalid target.created message", msg);
                 return;
             }
-
+            
             const timer = await Timer.findOneAndUpdate(
                 { _id: id },
                 { closeAt: new Date(endDate) },

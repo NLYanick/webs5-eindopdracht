@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 
 async function startConsumers() {
-    await consume('target.events', async (msg) => {
+    await consume('target.events', "submission.target", async (msg) => {
         if (msg.type === 'target.created') {
             try {
                 await Target.create({ _id: msg.data.id, organizerId: msg.data.organizerId });
@@ -43,7 +43,7 @@ async function startConsumers() {
             }
         }
     });
-    await consume('register.events', async (msg) => {
+    await consume('register.events', "submission.register", async (msg) => {
         if (msg.type === 'register.created') {
             try {
                 await Register.create({ _id: msg.data._id, targetId: msg.data.targetId, userUid: msg.data.userUid });
