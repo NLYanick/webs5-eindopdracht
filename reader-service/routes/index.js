@@ -15,7 +15,11 @@ const { fetchTargetId, isRegistered } = require('../services/middleware.js');
 // GET /reader/targets - list targets, filterable by city or lat/lng
 router.get('/targets', passport.authenticate('jwt', { session: false }), async function (req, res, next) {
     try {
-        const { city, lat, lng } = req.query;
+        const { city, lat, lng, page = 1, limit = 10 } = req.query;
+        const pageNum = Math.max(1, parseInt(page) || 1); // min 1
+        const limitNum = Math.min(Math.max(parseInt(limit) || 10, 0), 100); // 0 - 100
+        const skip = (pageNum - 1) * limitNum;
+
         let filter = {};
 
         if (city) {
@@ -33,11 +37,22 @@ router.get('/targets', passport.authenticate('jwt', { session: false }), async f
             });
         }
 
+        const total = targets.length;
+        targets = targets.slice(skip, skip + limitNum);
+
         if (targets.length === 0) {
             return res.status(404).json({ message: 'No targets found' });
         }
 
-        res.status(200).json(targets);
+        res.status(200).json({
+            targets,
+            pagination: {
+                page: pageNum,
+                limit: limitNum,
+                total,
+                pages: Math.ceil(total / limitNum)
+            }
+        });
     } catch (err) {
         res.status(500).json({ message: 'Internal server error', error: err.message });
     }
@@ -93,10 +108,11 @@ router.get('/targets/:id/submissions/:fileName', passport.authenticate('jwt', { 
 
     if (!submission) return res.status(404).json({ message: 'Submission not found' });
 
-    res.status(200).json({ submission: {
-        imageName: submission.imageName,
-        targetId: submission.targetId,
-        score: submission.score || null
+    res.status(200).json({ 
+        submission: {
+            imageName: submission.imageName,
+            targetId: submission.targetId,
+            score: submission.score || null
         } 
     });
     } 
