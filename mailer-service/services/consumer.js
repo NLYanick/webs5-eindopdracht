@@ -8,7 +8,7 @@ const Target = mongoose.model("Target");
 const Register = mongoose.model("Register");
 
 async function startConsumers() {
-    await consume('target.events', async (msg) => {
+    await consume('target.events', "mailer.target", async (msg) => {
         if (msg.type === 'target.reminder') {
             try {
                 const { targetId } = msg.data;
@@ -41,7 +41,7 @@ async function startConsumers() {
         }
     });
 
-    await consume('score.events', async (msg) => {
+    await consume('score.events', "mailer.score", async (msg) => {
         if (msg.type === 'score.created') {
             try {
                 const { userUid, score, targetId } = msg.data;
@@ -60,7 +60,7 @@ async function startConsumers() {
         }
     });
 
-    await consume('auth.events', async (msg) => {
+    await consume('auth.events', "mailer.auth", async (msg) => {
         if (msg.type === 'user.registered') {
             try {
                 const { uid, email, username } = msg.data;
@@ -74,7 +74,7 @@ async function startConsumers() {
         }
     });
 
-    await consume('register.events', async (msg) => {
+    await consume('register.events', "mailer.register", async (msg) => {
         if (msg.type === 'register.created') {
             try {
                 await Register.create( msg.data );
@@ -91,7 +91,7 @@ async function startConsumers() {
         }
     });
 
-    await consume('submission.events', async (msg) => {
+    await consume('submission.events', "mailer.submission", async (msg) => {
         if (msg.type === 'submission.created') {
             try {
                 const {targetId, userUid} = msg.data

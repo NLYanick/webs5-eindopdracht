@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 
 async function startConsumers() {
-    await consume('submission.events', async (msg) => {
+    await consume('submission.events', "score.submission", async (msg) => {
         if (msg.type === 'submission.created') {
             try {
                 const submission = msg.data;
@@ -80,8 +80,15 @@ async function startConsumers() {
                 console.error("Error calculating score:", error);
             }
         }
+        if (msg.type === 'submission.deleted') {
+            try {
+                await Score.deleteMany({ submissionId: msg.data.id });
+            } catch (error) {
+                console.error("Error saving submission deletion:", error);
+            }
+        }
     });
-    await consume('target.events', async (msg) => {
+    await consume('target.events', "score.target", async (msg) => {
         if (msg.type === 'target.created') {
             try {
                 await Target.create({ _id: msg.data.id, photoUrl: msg.data.photoUrl });
@@ -113,15 +120,6 @@ async function startConsumers() {
             } catch (error) {
                 console.error("Error while setting winner:", error);
             }  
-        }
-    });
-    await consume('submission.events', async (msg) => {
-        if (msg.type === 'submission.deleted') {
-            try {
-                await Score.deleteMany({ submissionId: msg.data.id });
-            } catch (error) {
-                console.error("Error saving submission deletion:", error);
-            }
         }
     });
 }
