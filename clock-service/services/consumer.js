@@ -1,6 +1,5 @@
 const { consume } = require("../../pubsub");
 const Timer = require("./database");
-const {scheduleTimer,cancelTimer} = require("./timerEngine");
 
 
 async function startConsumers() {
@@ -13,19 +12,17 @@ async function startConsumers() {
                 return;
             }
 
-            const timer = await Timer.findOneAndUpdate(
+            await Timer.findOneAndUpdate(
                 { _id: id },
                 { closeAt: new Date(endDate) },
                 { upsert: true, new: true }
             );
-
-            scheduleTimer(timer);
         }
         if (msg.type === 'target.deleted') {
             const id = msg.data._id;
             if (!id) return;
-            await cancelTimer(id);
 
+            await Timer.findByIdAndDelete({ _id: id });
         }
     });
 }
