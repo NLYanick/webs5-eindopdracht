@@ -37,8 +37,8 @@ services:
       context: .
       dockerfile: auth-service/Dockerfile
     container_name: webs5-auth-service
-    ports:
-      - "3001:3001"
+    # ports:
+    #   - "3001:3001"
     env_file:
       - .env
     depends_on:
@@ -52,8 +52,8 @@ services:
       context: .
       dockerfile: target-service/Dockerfile
     container_name: webs5-target-service
-    ports:
-      - "3002:3002"
+    # ports:
+    #   - "3002:3002"
     env_file:
       - .env
     depends_on:
@@ -69,8 +69,8 @@ services:
       context: .
       dockerfile: submission-service/Dockerfile
     container_name: webs5-submission-service
-    ports:
-      - "3003:3003"
+    # ports:
+    #   - "3003:3003"
     env_file:
       - .env
     depends_on:
@@ -86,8 +86,8 @@ services:
       context: .
       dockerfile: score-service/Dockerfile
     container_name: webs5-score-service
-    ports:
-      - "3004:3004"
+    # ports:
+    #   - "3004:3004"
     env_file:
       - .env
     depends_on:
@@ -103,8 +103,8 @@ services:
       context: .
       dockerfile: clock-service/Dockerfile
     container_name: webs5-clock-service
-    ports:
-      - "3005:3005"
+    # ports:
+    #   - "3005:3005"
     env_file:
       - .env
     depends_on:
@@ -118,8 +118,8 @@ services:
       context: .
       dockerfile: reader-service/Dockerfile
     container_name: webs5-reader-service
-    ports:
-      - "3006:3006"
+    # ports:
+    #   - "3006:3006"
     env_file:
       - .env
     depends_on:
@@ -133,8 +133,8 @@ services:
       context: .
       dockerfile: register-service/Dockerfile
     container_name: webs5-register-service
-    ports:
-      - "3007:3007"
+    # ports:
+    #   - "3007:3007"
     env_file:
       - .env
     depends_on:
@@ -148,8 +148,8 @@ services:
       context: .
       dockerfile: mailer-service/Dockerfile
     container_name: webs5-mailer-service
-    ports:
-      - "3008:3008"
+    # ports:
+    #   - "3008:3008"
     env_file:
       - .env
     depends_on:
