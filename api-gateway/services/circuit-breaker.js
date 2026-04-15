@@ -2,7 +2,7 @@ const CircuitBreaker = require('opossum');
 const { callService } = require('../../utils');
 
 const breakerOptions = {
-    timeout: 3000,
+    timeout: 10000,
     errorThresholdPercentage: 50,
     resetTimeout: 10000
 };
